@@ -3,16 +3,20 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 const Statistics = (props) => {
-  return (
-    <div>
-      <h1>statistics</h1>
-      <p>good {props.good}</p>
-      <p>neutral {props.neutral}</p>
-      <p>bad {props.bad}</p>
-      <p>average {props.average}</p>
-      <p>positive {props.positive}</p>
-    </div>
-  );
+  if (props.total !== 0) {
+    return (
+      <div>
+        <h1>statistics</h1>
+        <p>good {props.good}</p>
+        <p>neutral {props.neutral}</p>
+        <p>bad {props.bad}</p>
+        <p>average {props.average}</p>
+        <p>positive {props.positive}</p>
+      </div>
+    );
+  } else {
+    return <p>No feedback given</p>;
+  }
 };
 
 const App = () => {
@@ -31,6 +35,7 @@ const App = () => {
       <button onClick={() => setNeutral(neutral + 1)}>neutral</button>
       <button onClick={() => setBad(bad + 1)}>bad</button>
       <Statistics
+        total={total}
         good={good}
         bad={bad}
         neutral={neutral}
