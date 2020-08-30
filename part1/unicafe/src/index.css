@@ -22,3 +22,8 @@ button {
   display: inline-block;
   background-color: lightgray;
 }
+
+table {
+  border: 1px solid lightgray;
+  padding: 2px;
+}
