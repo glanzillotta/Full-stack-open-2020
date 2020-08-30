@@ -3,7 +3,8 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 const App = ({ anecdotes }) => {
-  const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState(Math.floor(Math.random() * 6));
+  const [max, setMax] = useState(Math.floor(Math.random() * 6));
   const [votes, setVotes] = useState(
     Array.apply(null, new Array(anecdotes.length)).map(
       Number.prototype.valueOf,
@@ -19,15 +20,25 @@ const App = ({ anecdotes }) => {
     const newVotes = [...votes];
     newVotes[selected] = newVotes[selected] + 1;
     setVotes(newVotes);
+    newVotes.forEach((e, i) => {
+      if (e > max) setMax(i);
+      console.log(max);
+    });
   };
 
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       <p> {anecdotes[selected]}</p>
       <p>has {votes[selected]} votes</p>
       <div>
         <button onClick={incVote}>vote</button>
         <button onClick={rndAnecdotes}>next anecdotes</button>
+      </div>
+      <div>
+        <h1>Anecdote with most votes</h1>
+        <p>{anecdotes[max]}</p>
+        <p>has {votes[max]} votes</p>
       </div>
     </div>
   );
