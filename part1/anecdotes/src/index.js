@@ -2,17 +2,33 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
-const App = (props) => {
+const App = ({ anecdotes }) => {
   const [selected, setSelected] = useState(0);
+  const [votes, setVotes] = useState(
+    Array.apply(null, new Array(anecdotes.length)).map(
+      Number.prototype.valueOf,
+      0
+    )
+  );
 
   const rndAnecdotes = () => {
     setSelected(Math.floor(Math.random() * 6));
   };
+
+  const incVote = () => {
+    const newVotes = [...votes];
+    newVotes[selected] = newVotes[selected] + 1;
+    setVotes(newVotes);
+  };
+
   return (
     <div>
-      {props.anecdotes[selected]}
-      <br />
-      <button onClick={rndAnecdotes}>next anecdotes</button>
+      <p> {anecdotes[selected]}</p>
+      <p>has {votes[selected]} votes</p>
+      <div>
+        <button onClick={incVote}>vote</button>
+        <button onClick={rndAnecdotes}>next anecdotes</button>
+      </div>
     </div>
   );
 };
