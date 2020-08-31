@@ -2,14 +2,18 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 const Header = (props) => {
+  const { course } = props;
+
   return (
     <div>
-      <h1>{props.course}</h1>
+      <h1>{course}</h1>
     </div>
   );
 };
 
-const Part = ({ name, exercises }) => {
+const Part = (props) => {
+  const { name, exercises } = props;
+
   return (
     <div>
       <p>
@@ -19,7 +23,9 @@ const Part = ({ name, exercises }) => {
   );
 };
 
-const Content = ({ parts }) => {
+const Content = (props) => {
+  const { parts } = props;
+
   return (
     <div>
       {parts.map((part) => (
@@ -30,14 +36,14 @@ const Content = ({ parts }) => {
 };
 
 const Total = (props) => {
+  const { parts } = props;
+  const total = parts
+    .map((part) => part.exercises)
+    .reduce((acc, cur) => acc + cur);
+
   return (
     <div>
-      <p>
-        Number of exercises{" "}
-        {props.props[0].exercises +
-          props.props[1].exercises +
-          props.props[2].exercises}
-      </p>
+      <strong>Number of exercises {total}</strong>
     </div>
   );
 };
@@ -48,6 +54,7 @@ const Course = (props) => {
     <div>
       <Header course={course.name} />
       <Content parts={course.parts} />
+      <Total parts={course.parts} />
     </div>
   );
 };
@@ -72,6 +79,7 @@ const App = () => {
         exercises: 14,
         id: 3,
       },
+      { name: "Redux", exercises: 11, id: 4 },
     ],
   };
 
