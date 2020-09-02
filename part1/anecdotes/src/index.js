@@ -21,7 +21,7 @@ const App = ({ anecdotes }) => {
     newVotes[selected] = newVotes[selected] + 1;
     setVotes(newVotes);
     newVotes.forEach((e, i) => {
-      if (e > max) setMax(i);
+      if (Math.max(e, max)) setMax(i);
       console.log(max);
     });
   };

@@ -4,9 +4,17 @@ import "./index.css";
 const App = () => {
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", number: "040-1234567" },
+    { name: "Ada Lovelace", number: "39-44-5323523" },
+    { name: "Dan Abramov", number: "12-43-234345" },
+    { name: "Mary Poppendieck", number: "39-23-6423122" },
   ]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
+  const [search, setSearch] = useState("");
+
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+  };
 
   const handleForm = (event) => {
     event.preventDefault();
@@ -30,12 +38,13 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      filter shown with <input type="text" onChange={handleSearch} />
       <form onSubmit={handleForm}>
         <div>
-          name: <input onChange={handleNewName} />
+          name: <input type="text" onChange={handleNewName} />
         </div>
         <div>
-          number: <input onChange={handleNewNumber} />
+          number: <input type="text" onChange={handleNewNumber} />
         </div>
         <div>
           <input type="submit" value="add" onClick={handleAddName} />
@@ -48,6 +57,17 @@ const App = () => {
             {person.name} {person.number}
           </li>
         ))}
+      </ul>
+      <ul>
+        {persons
+          .filter(
+            (person) => person.name.toLowerCase() === search.toLowerCase()
+          )
+          .map((person, i) => (
+            <li key={i}>
+              {person.name} {person.number}
+            </li>
+          ))}
       </ul>
     </div>
   );
