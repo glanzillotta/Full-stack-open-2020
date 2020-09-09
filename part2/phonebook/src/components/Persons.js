@@ -9,7 +9,6 @@ const Persons = (props) => {
       </div>
     );
   };
-
   return search === ""
     ? persons.map(printPerson)
     : persons
