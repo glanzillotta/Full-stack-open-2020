@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 
 const PersonForm = (props) => {
   const {
@@ -12,6 +13,11 @@ const PersonForm = (props) => {
 
   const handleForm = (event) => {
     event.preventDefault();
+    const personObj = {
+      name: newName,
+      number: newNumber,
+    };
+    axios.post("http://localhost:3001/persons", personObj);
   };
 
   const handleNewName = (event) => {
