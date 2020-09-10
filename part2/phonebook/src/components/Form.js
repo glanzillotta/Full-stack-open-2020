@@ -9,6 +9,7 @@ const PersonForm = (props) => {
     setNewNumber,
     persons,
     setPersons,
+    setMessage,
   } = props;
   const newObject = { name: newName, number: newNumber };
 
@@ -37,8 +38,13 @@ const PersonForm = (props) => {
         )
       )
         personService.update(id, newObject);
+      setMessage(`Number of ${newObject.name} modified`);
+      setTimeout(() => setMessage(null), 5000);
+      setPersons([...persons, newObject]);
     } else {
       personService.add(newObject);
+      setMessage(`Added ${newObject.name}`);
+      setTimeout(() => setMessage(null), 5000);
       setPersons([...persons, newObject]);
     }
   };
