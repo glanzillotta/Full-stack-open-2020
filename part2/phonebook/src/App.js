@@ -28,7 +28,7 @@ const App = () => {
         newName={newName}
         setNewName={setNewName}
       />
-      <Persons persons={persons} search={search} />
+      <Persons persons={persons} setPersons={setPersons} search={search} />
     </div>
   );
 };
