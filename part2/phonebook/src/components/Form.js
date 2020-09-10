@@ -10,14 +10,10 @@ const PersonForm = (props) => {
     persons,
     setPersons,
   } = props;
+  const newObject = { name: newName, number: newNumber };
 
   const handleForm = (event) => {
     event.preventDefault();
-    const personObj = {
-      name: newName,
-      number: newNumber,
-    };
-    personService.add(personObj);
   };
 
   const handleNewName = (event) => {
@@ -29,9 +25,22 @@ const PersonForm = (props) => {
   };
 
   const handleAddName = () => {
-    if (persons.find((person) => person.name === newName))
-      alert(`${newName} is already added to phonebook`);
-    else setPersons([...persons, { name: newName, number: newNumber }]);
+    let id = null;
+    if (
+      persons.find((person) =>
+        person.name === newName ? (id = person.id) : null
+      )
+    ) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      )
+        personService.update(id, newObject);
+    } else {
+      personService.add(newObject);
+      setPersons([...persons, newObject]);
+    }
   };
   return (
     <form onSubmit={handleForm}>
