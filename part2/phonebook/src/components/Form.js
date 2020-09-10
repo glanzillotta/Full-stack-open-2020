@@ -37,8 +37,15 @@ const PersonForm = (props) => {
           `${newName} is already added to phonebook, replace the old number with a new one?`
         )
       )
-        personService.update(id, newObject);
-      setMessage(`Number of ${newObject.name} modified`);
+        personService
+          .update(id, newObject)
+          .catch(
+            setMessage(
+              `Information of ${newObject.name} has been removed from the server`,
+              true
+            )
+          );
+      setMessage(`Number of ${newObject.name} modified`, false);
       setTimeout(() => setMessage(null), 5000);
       setPersons([...persons, newObject]);
     } else {
