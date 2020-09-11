@@ -53,6 +53,13 @@ app.post("/api/persons", (req, res) => {
   const id = Math.floor(Math.random() * 1000);
   person = req.body;
   person.id = id;
+  if (persons.find((p) => (p.name = person.name)))
+    return res.status(400).json({
+      errors: "name must be unique",
+    });
+  if (!person.name) return res.status(400).json({ errors: "must have a name" });
+  if (!person.number)
+    return res.status(400).json({ errors: "must have a number" });
   persons = persons.concat(person);
   res.json(person);
 });
