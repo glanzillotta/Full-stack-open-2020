@@ -39,20 +39,23 @@ const PersonForm = (props) => {
       )
         personService
           .update(id, newObject)
-          .catch(
-            setMessage(
-              `Information of ${newObject.name} has been removed from the server`,
-              true
-            )
+          .then(() => {
+            setMessage({text:`Information of ${newObject.name} has been updated`,type:false});
+            setPersons([...persons, newObject]);               
+          })
+          .catch((error)=>{
+            setMessage({
+              text:`Information of ${newObject.name} has been removed from the server`,
+              type:true}
+            )}
           );
-      setMessage(`Number of ${newObject.name} modified`, false);
-      setTimeout(() => setMessage(null), 5000);
-      setPersons([...persons, newObject]);
     } else {
-      personService.add(newObject);
-      setMessage(`Added ${newObject.name}`);
-      setTimeout(() => setMessage(null), 5000);
-      setPersons([...persons, newObject]);
+      personService.add(newObject)
+      .then(() => {
+        setPersons([...persons, newObject]);   
+        setMessage({text:`Added ${newObject.name}`,type:false});
+      })
+      .catch((error) =>setMessage({text:error.message,type:true})) 
     }
   };
   return (

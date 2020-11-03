@@ -11,16 +11,18 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
-  const [message, setMessage] = useState(null);
+  const [message, setMessage] = useState({text:null,type:Boolean});
 
   useEffect(() => {
-    personService.getAll().then((initialPers) => setPersons(initialPers));
-  }, []);
+    personService.getAll().then((response) => {
+      setPersons(response);
+    }).catch(error => setMessage({text:error.message,type:true}));
+  }, [persons.length]);
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} />
+      <Notification message={message} setMessage={setMessage} />
       <Filter setSearch={setSearch} />
       <h2>Numbers</h2>
       <Form
@@ -32,9 +34,9 @@ const App = () => {
         newName={newName}
         setNewName={setNewName}
       />
-      <Persons persons={persons} setPersons={setPersons} search={search} />
+      <Persons persons={persons} setPersons={setPersons} search={search} setMessage={setMessage} />
     </div>
-  );
+  )
 };
 
 export default App;

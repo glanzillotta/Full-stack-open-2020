@@ -2,23 +2,27 @@ import React from "react";
 import personService from "../services/person";
 
 const Persons = (props) => {
-  const { persons, search, setPersons } = props;
-  const handleClick = (event) => {
-    if (window.confirm(`Delete ${persons[event.target.id - 1].name}`)) {
-      personService.remove(event.target.id);
-      setPersons(persons.filter((person) => person.id !== event.target.id));
+  const { persons, search, setPersons, setMessage } = props;
+  const handleClick = (id) => {
+    const person=persons.find(p => p.id === id);
+    if (window.confirm(`Delete ${person.name}`)) {
+      personService.remove(id)
+      .then(() => {
+        setMessage({text:`${person.name} has been removed from the server`,type:false});
+        setPersons(persons.filter((person) => person.id !== id));
+    });
+      
     }
   };
 
   const printPerson = (person) => {
     return (
-      <div>
+      <div key={person.id}>
         {person.name} {person.number}{" "}
         <input
-          id={person.id}
           type="button"
           value="delete"
-          onClick={handleClick}
+          onClick={()=>handleClick(person.id)}
         />
       </div>
     );
