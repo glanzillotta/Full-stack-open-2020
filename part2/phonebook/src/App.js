@@ -11,12 +11,14 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
-  const [message, setMessage] = useState({text:null,type:Boolean});
+  const [message, setMessage] = useState([]);
 
   useEffect(() => {
-    personService.getAll().then((response) => {
+    personService.getAll()
+    .then((response) => {
       setPersons(response);
-    }).catch(error => setMessage({text:error.message,type:true}));
+    })
+    .catch(err => setMessage([err.response.data, "fail"]));
   }, [persons.length]);
 
   return (

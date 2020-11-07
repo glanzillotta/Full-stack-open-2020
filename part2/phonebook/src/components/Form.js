@@ -40,22 +40,20 @@ const PersonForm = (props) => {
         personService
           .update(id, newObject)
           .then(() => {
-            setMessage({text:`Information of ${newObject.name} has been updated`,type:false});
+            setMessage([`Information of ${newObject.name} has been updated`, "success"]);
             setPersons([...persons, newObject]);               
           })
           .catch((error)=>{
-            setMessage({
-              text:`Information of ${newObject.name} has been removed from the server`,
-              type:true}
+            setMessage([`Information of ${newObject.name} has been removed from the server`, "fail"]
             )}
           );
     } else {
       personService.add(newObject)
       .then(() => {
         setPersons([...persons, newObject]);   
-        setMessage({text:`Added ${newObject.name}`,type:false});
+        setMessage([`Added ${newObject.name}`, "success"]);
       })
-      .catch((error) =>setMessage({text:error.message,type:true})) 
+      .catch((error) =>setMessage([error.response.data.error, "fail"])); 
     }
   };
   return (

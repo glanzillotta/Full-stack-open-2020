@@ -2,15 +2,21 @@ import React from "react";
 import personService from "../services/person";
 
 const Persons = (props) => {
-  const { persons, search, setPersons, setMessage } = props;
+  const { 
+    persons, 
+    search, 
+    setPersons, 
+    setMessage, 
+  } = props;
+
   const handleClick = (id) => {
     const person=persons.find(p => p.id === id);
     if (window.confirm(`Delete ${person.name}`)) {
       personService.remove(id)
       .then(() => {
-        setMessage({text:`${person.name} has been removed from the server`,type:false});
+        setMessage([`${person.name} has been removed from the server`, "success"]);
         setPersons(persons.filter((person) => person.id !== id));
-    });
+    }).catch(err => {setMessage([err.message, "fail"])});
       
     }
   };
