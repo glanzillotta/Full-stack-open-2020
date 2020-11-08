@@ -1,3 +1,5 @@
+const _ =require("lodash")
+
 const dummy = (blogs) => {
   if (Array.isArray(blogs)) return 1;
 };
@@ -24,8 +26,21 @@ const favoriteBlog = (blogs) => {
   return { title: blog.title, author: blog.author, likes: blog.likes };
 };
 
+const mostBlogs  = (blogs) => {
+  let numBlog=_(blogs).groupBy('author')
+    .map((items, a)=>{
+      return{ 
+        author: a,
+        blogs: _.map(items, 'authors').length
+      }
+  }).value()
+
+  return _.maxBy(numBlog,'blogs')
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
+  mostBlogs
 };
