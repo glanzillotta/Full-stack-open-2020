@@ -86,7 +86,7 @@ describe("total likes", () => {
     expect(result).toBe(36);
   });
 
-  test("article with the bigger number of like", ()=>{
+  test("article with the most likes", ()=>{
     const result= listHelper.favoriteBlog(blogs);
     expect(result).toEqual({
       title: "Canonical string reduction",
@@ -95,11 +95,19 @@ describe("total likes", () => {
     });
   })
 
-  test("author with the bigger number of blog", ()=>{
+  test("author with the most blogs", ()=>{
     const result= listHelper.mostBlogs(blogs)
     expect(result).toEqual({
       author:'Robert C. Martin',
       blogs:3
+    })
+  })
+
+  test("author with the most likes", ()=>{
+    const result= listHelper.mostLikes(blogs)
+    expect(result).toEqual({
+      author: "Edsger W. Dijkstra",
+      likes: 17
     })
   })
 
