@@ -9,12 +9,12 @@ import { initialBlog } from "./test_helper.js";
 const api = supertest(app);
 
 beforeEach(async () => {
-    await Blog.deleteMany({})
-    for (let blog of initialBlog){
-        let blogObject =new Blog(blog)
-        await blogObject.save()
-    }
-})
+  await Blog.deleteMany({});
+  for (let blog of initialBlog) {
+    let blogObject = new Blog(blog);
+    await blogObject.save();
+  }
+});
 
 test("blogs returned as json", async () => {
   await api
@@ -30,9 +30,20 @@ test("blogs return correct amount of blog post", async () => {
 
 test("the unique identifier property of blog post is named id", async () => {
   const response = await api.get("/api/blogs");
-  await response.body.forEach(blog=>{
-      expect(blog.id).toBeDefined()
-  })
+  await response.body.forEach((blog) => {
+    expect(blog.id).toBeDefined();
+  });
+});
+
+test("successfully create a new blog", async () => {
+  const newBlog = {
+    title: "The Real Texas",
+    author: "Annette Gordon-Reed",
+    url: "https://getpocket.com/explore/item/the-real-texas",
+    likes: 3,
+  };
+  const response = await api.post("/api/blogs").send(newBlog).expect(201);
+  expect(response.body).toEqual(expect.objectContaining(newBlog));
 });
 
 afterAll(() => {
