@@ -3,8 +3,18 @@ import "regenerator-runtime/runtime";
 import { connection } from "mongoose";
 import supertest from "supertest";
 import app from "../app.js";
+import Blog from "../models/blog.js";
+import { initialBlog } from "./test_helper.js";
 
 const api = supertest(app);
+
+beforeEach(async () => {
+    await Blog.deleteMany({})
+    for (let blog of initialBlog){
+        let blogObject =new Blog(blog)
+        await blogObject.save()
+    }
+})
 
 test("blogs returned as json", async () => {
   await api
@@ -15,7 +25,14 @@ test("blogs returned as json", async () => {
 
 test("blogs return correct amount of blog post", async () => {
   const response = await api.get("/api/blogs");
-  expect(response.body.length).toBe(1);
+  expect(response.body).toHaveLength(initialBlog.length);
+});
+
+test("the unique identifier property of blog post is named id", async () => {
+  const response = await api.get("/api/blogs");
+  await response.body.forEach(blog=>{
+      expect(blog.id).toBeDefined()
+  })
 });
 
 afterAll(() => {
