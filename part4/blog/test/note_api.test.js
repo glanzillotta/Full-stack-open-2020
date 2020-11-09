@@ -10,10 +10,9 @@ const api = supertest(app);
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  for (let blog of initialBlog) {
-    let blogObject = new Blog(blog);
-    await blogObject.save();
-  }
+  const blogObj = initialBlog.map((blog) => new Blog(blog));
+  const promises = blogObj.map((blog) => blog.save());
+  await Promise.all(promises);
 });
 
 test("blogs returned as json", async () => {
@@ -47,11 +46,22 @@ test("successfully create a new blog", async () => {
 });
 
 test("likes property is missing", async () => {
-  const response = await api.get("/api/blogs")
-  response.body.forEach((blog) => {
-    expect(blog.likes).toBeGreaterThanOrEqual(0)
-  })
-})
+  const errLike = {
+    title: "The Real Texas",
+    author: "Annette Gordon-Reed",
+    url: "https://getpocket.com/explore/item/the-real-texas",
+  };
+  const response = await api.post("/api/blogs").send(errLike);
+  expect(response.body.likes).toBeGreaterThanOrEqual(0);
+});
+
+test("missing data from new blog ", async () => {
+  const errBlog = {
+    author: "Annette Gordon-Reed",
+    likes: 3,
+  };
+  await api.post("/api/blogs").send(errBlog).expect(400);
+});
 
 afterAll(() => {
   connection.close();
