@@ -46,6 +46,13 @@ test("successfully create a new blog", async () => {
   expect(response.body).toEqual(expect.objectContaining(newBlog));
 });
 
+test("likes property is missing", async () => {
+  const response = await api.get("/api/blogs")
+  response.body.forEach((blog) => {
+    expect(blog.likes).toBeGreaterThanOrEqual(0)
+  })
+})
+
 afterAll(() => {
   connection.close();
 });
