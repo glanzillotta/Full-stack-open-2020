@@ -1,4 +1,4 @@
-const _ =require("lodash")
+const _ = require("lodash");
 
 const dummy = (blogs) => {
   if (Array.isArray(blogs)) return 1;
@@ -26,34 +26,38 @@ const favoriteBlog = (blogs) => {
   return { title: blog.title, author: blog.author, likes: blog.likes };
 };
 
-const mostBlogs  = (blogs) => {
-  let numBlog=_(blogs).groupBy('author')
-    .map((items, a)=>{
-      return{ 
+const mostBlogs = (blogs) => {
+  let numBlog = _(blogs)
+    .groupBy("author")
+    .map((items, a) => {
+      return {
         author: a,
-        blogs: _.map(items, 'authors').length
-      }
-  }).value()
+        blogs: _.map(items, "authors").length,
+      };
+    })
+    .value();
 
-  return _.maxBy(numBlog,'blogs')
-}
+  return _.maxBy(numBlog, "blogs");
+};
 
-const mostLikes  = (blogs) => {
-  let numLikes=_(blogs).groupBy('author')
-    .map((items, a)=>{
-      return{ 
+const mostLikes = (blogs) => {
+  let numLikes = _(blogs)
+    .groupBy("author")
+    .map((items, a) => {
+      return {
         author: a,
-        likes: _.sumBy(items,'likes')
-      }
-  }).value()
-  
-  return _.maxBy(numLikes,'likes')
-}
+        likes: _.sumBy(items, "likes"),
+      };
+    })
+    .value();
+
+  return _.maxBy(numLikes, "likes");
+};
 
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
-  mostLikes
+  mostLikes,
 };
