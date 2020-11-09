@@ -1,23 +1,19 @@
-import Blog from '../models/blog.js'
-import {Router} from "express"
-const blogsRouter=Router();
+import Blog from "../models/blog.js";
+import { Router } from "express";
+const blogsRouter = Router();
 
-blogsRouter.get('/', (request, response) => {
-  Blog
-    .find({})
-    .then(blogs => {
-      response.json(blogs)
-    })
-})
+blogsRouter.get("/", async (request, response) => {
+  const blogFound= await Blog.find({})
+  response.status(200).json(blogFound);
   
-blogsRouter.post('/', (request, response) => {
-  const blog = new Blog(request.body)
- 
-  blog
-    .save()
-    .then(result => {
-      response.status(201).json(result)
-    })
-})
+});
+
+blogsRouter.post("/", async (request, response) => {
+  const blog = new Blog(request.body);
+
+  const blogSaved = await blog.save()
+  response.status(201).json(blogSaved);
+  
+});
 
 export default blogsRouter;
