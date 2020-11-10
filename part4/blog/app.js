@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { json } from "express";
 const app = express();
+import "express-async-errors";
 import mongoose from "mongoose";
 const { connect } = mongoose;
 import { MONGODB_URI } from "./utils/config.js";
