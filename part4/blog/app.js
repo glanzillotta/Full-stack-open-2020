@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 const { connect } = mongoose;
 import { MONGODB_URI } from "./utils/config.js";
 import blogsRouter from "./controllers/blogs.js";
+import usersRouter from "./controllers/users.js"
 import {
   requestLogger,
   unknownEndpoint,
@@ -23,6 +24,7 @@ app.use(cors());
 app.use(json());
 app.use(requestLogger);
 
+app.use("/api/users", usersRouter)
 app.use("/api/blogs", blogsRouter);
 app.use(unknownEndpoint);
 app.use(errorHandler);

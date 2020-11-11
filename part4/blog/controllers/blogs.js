@@ -1,22 +1,34 @@
 import Blog from "../models/blog.js";
+import User from "../models/user.js";
 import { Router } from "express";
 const blogsRouter = Router();
 
 blogsRouter.get("/", async (request, response) => {
-  const blogFound = await Blog.find({});
-  response.status(200).json(blogFound);
+  const blogs = await Blog.find({}).populate("user", {
+    username: 1,
+    name: 1,
+    id: 1,
+  });
+  response.status(200).json(blogs).end();
 });
 
 blogsRouter.post("/", async (request, response) => {
-  const blog = new Blog(request.body);
-
   if (request.body.title === undefined || request.body.url === undefined)
     return response.status(400).end();
 
-  if (request.body.likes === undefined) blog.likes = 0;
+  const user = await User.findById(request.body.userId);
+  const blog = new Blog({
+    title: request.body.title,
+    author: request.body.author,
+    url: request.body.url,
+    likes: request.body.likes,
+    user: user._id,
+  });
 
-  const blogSaved = await blog.save();
-  response.status(201).json(blogSaved);
+  const savedBlog = await blog.save();
+  user.blogs = user.blogs.concat(savedBlog._id);
+  await user.save();
+  response.status(201).json(savedBlog).end();
 });
 
 blogsRouter.delete("/:id", async (req, res) => {
