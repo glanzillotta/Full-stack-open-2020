@@ -1,7 +1,15 @@
 import Blog from "../models/blog.js";
 import User from "../models/user.js";
+import jwt from "jsonwebtoken";
 import { Router } from "express";
 const blogsRouter = Router();
+
+const getTokenFrom = (req) => {
+  const authorization = req.get("authorization");
+  if (authorization && authorization.toLowerCase().startsWith("bearer "))
+    return authorization.substring("bearer ".length);
+  return null;
+};
 
 blogsRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user", {
@@ -16,7 +24,11 @@ blogsRouter.post("/", async (request, response) => {
   if (request.body.title === undefined || request.body.url === undefined)
     return response.status(400).end();
 
-  const user = await User.findById(request.body.userId);
+  const token = jwt.verify(getTokenFrom(request), SECRET);
+  if (!token.id)
+    return response.status(401).json({ error: "token missing or invalid" });
+
+  const user = await User.findById(token.id);
   const blog = new Blog({
     title: request.body.title,
     author: request.body.author,
