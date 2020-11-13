@@ -1,12 +1,13 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../models/user.js";
-import { SECRET } from "../utils/config,js";
+import { SECRET } from "../utils/config.js";
 import { response, Router } from "express";
 const loginRouter = Router();
 
 loginRouter.post("/", async (req, res) => {
   const user = await User.findOne({ username: req.body.username });
+  
   const passwordCorrect =
     user === null
       ? false
@@ -22,7 +23,7 @@ loginRouter.post("/", async (req, res) => {
 
   const token = jwt.sign(userForToken, SECRET);
 
-  response
+  res
     .status(200)
     .send({ token, username: user.username, name: user.name });
 });
