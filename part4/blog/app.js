@@ -6,11 +6,13 @@ import mongoose from "mongoose";
 const { connect } = mongoose;
 import { MONGODB_URI } from "./utils/config.js";
 import blogsRouter from "./controllers/blogs.js";
-import usersRouter from "./controllers/users.js"
+import usersRouter from "./controllers/users.js";
+import loginRouter from "./controllers/login.js";
 import {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenExtractor,
 } from "./utils/middleware.js";
 
 connect(MONGODB_URI, {
@@ -23,8 +25,10 @@ connect(MONGODB_URI, {
 app.use(cors());
 app.use(json());
 app.use(requestLogger);
+app.use(tokenExtractor);
 
-app.use("/api/users", usersRouter)
+app.use("/api/login", loginRouter);
+app.use("/api/users", usersRouter);
 app.use("/api/blogs", blogsRouter);
 app.use(unknownEndpoint);
 app.use(errorHandler);

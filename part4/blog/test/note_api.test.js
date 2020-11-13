@@ -47,12 +47,15 @@ describe("user validation", () => {
 
     const usersAtEnd = await usersInDb();
     expect(usersAtEnd).toHaveLength(usersAtStart.length + 1);
+
+    const username = usersAtEnd.map((u) => u.username);
+    expect(username).toContain(newUser.username);
   });
 
   test("creation fails with proper statuscode of a password with less than 3 characters", async () => {
     const usersAtStart = await usersInDb();
     const newUser = {
-      username: "hellas",
+      username: "hell",
       name: "Arto Hellas",
       password: "he",
     };
@@ -61,7 +64,7 @@ describe("user validation", () => {
       .post("/api/users")
       .send(newUser)
       .expect(400)
-      .expect({error:"password must have at least 3 characters"});
+      .expect({ error: "password must have at least 3 characters" });
 
     const usersAtEnd = await usersInDb();
     expect(usersAtEnd).toHaveLength(usersAtStart.length);
@@ -69,10 +72,12 @@ describe("user validation", () => {
 
   test("creation fails with proper statuscode and message if user is not unique", async () => {
     const usersAtStart = await usersInDb();
-    const response = await api
-      .post("/api/users")
-      .send({ username: "root", password: "pass" })
-      .expect(400);
+    const newUser = {
+      username: "root",
+      name: "Superuser",
+      password: "salainen",
+    };
+    const response = await api.post("/api/users").send(newUser).expect(400);
     expect(response.body.error).toContain("`username` to be unique");
 
     const usersAtEnd = await usersInDb();
@@ -109,7 +114,7 @@ describe("initial presence of the blogs", () => {
       .get("/api/blogs")
       .expect(200)
       .expect("Content-Type", /application\/json/);
-  }, 30000);
+  });
 
   test("blogs return correct amount of blog post", async () => {
     const response = await api.get("/api/blogs");
@@ -120,7 +125,6 @@ describe("initial presence of the blogs", () => {
 describe("validation of a blog", () => {
   test("creation succeed", async () => {
     const users = await usersInDb();
-    const userId = users[users.length - 1].id;
     const blogsAtStart = await blogsInDb();
 
     const newBlog = {
@@ -128,10 +132,21 @@ describe("validation of a blog", () => {
       author: "Annette Gordon-Reed",
       url: "https://getpocket.com/explore/item/the-real-texas",
       likes: 3,
-      userId: userId,
     };
 
-    const response = await api.post("/api/blogs").send(newBlog).expect(201);
+    const result = await api
+      .post("/api/login")
+      .send({ username: "root", password: "sekret" })
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const response = await api
+      .post("/api/blogs")
+      .set("Authorization", `bearer ${result.body.token}`)
+      .send(newBlog)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
     expect(response.body).toEqual(
       expect.objectContaining({
         title: newBlog.title,
@@ -158,9 +173,22 @@ describe("validation of a blog", () => {
       title: "How To Safely Store A Password",
       author: "Coda Hale",
       url: "https://codahale.com/how-to-safely-store-a-password/",
-      userId: userId
+      userId: userId,
     };
-    const response = await api.post("/api/blogs").send(errLike).expect(201);
+
+    const result = await api
+      .post("/api/login")
+      .send({ username: "root", password: "sekret" })
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const response = await api
+      .post("/api/blogs")
+      .set("Authorization", `bearer ${result.body.token}`)
+      .send(errLike)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
     expect(response.body.likes).toBe(0);
   });
 
@@ -193,7 +221,7 @@ describe("modification of a blog", () => {
         "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
       likes: 22,
     };
-    const blogId = blogsAtStart.find(b => b.title === blog.title).id;
+    const blogId = blogsAtStart.find((b) => b.title === blog.title).id;
 
     const response = await api
       .put(`/api/blogs/${blogId}`)
