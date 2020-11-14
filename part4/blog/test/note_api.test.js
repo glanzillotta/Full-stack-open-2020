@@ -10,7 +10,7 @@ import { initialBlog, usersInDb, blogsInDb } from "./test_helper.js";
 
 const api = supertest(app);
 
-beforeEach(async () => {
+beforeAll(async () => {
   await User.deleteMany({});
   await Blog.deleteMany({});
 
@@ -89,7 +89,8 @@ describe("user validation", () => {
     await api
       .post("/api/users")
       .send({ username: "DarioMocciaTwitch" })
-      .expect(400);
+      .expect(400)
+      .expect({ error: "username and password are required" });
 
     const usersAtEnd = await usersInDb();
     expect(usersAtEnd).toHaveLength(usersAtStart.length);
@@ -101,7 +102,8 @@ describe("user validation", () => {
     await api
       .post("/api/users")
       .send({ name: "DarioMocciaTwitch" })
-      .expect(400);
+      .expect(400)
+      .expect({ error: "username and password are required" });
 
     const usersAtEnd = await usersInDb();
     expect(usersAtEnd).toHaveLength(usersAtStart.length);
@@ -124,9 +126,7 @@ describe("initial presence of the blogs", () => {
 
 describe("validation of a blog", () => {
   test("creation succeed", async () => {
-    const users = await usersInDb();
     const blogsAtStart = await blogsInDb();
-
     const newBlog = {
       title: "The Real Texas",
       author: "Annette Gordon-Reed",
@@ -167,13 +167,11 @@ describe("validation of a blog", () => {
   });
 
   test("creation succeed if the blog doesn't have explicit number of likes", async () => {
-    const users = await usersInDb();
-    const userId = users[users.length - 1].id;
-    const errLike = {
+    const blogsAtStart = await blogsInDb();
+    const noLikes = {
       title: "How To Safely Store A Password",
       author: "Coda Hale",
       url: "https://codahale.com/how-to-safely-store-a-password/",
-      userId: userId,
     };
 
     const result = await api
@@ -185,11 +183,13 @@ describe("validation of a blog", () => {
     const response = await api
       .post("/api/blogs")
       .set("Authorization", `bearer ${result.body.token}`)
-      .send(errLike)
+      .send(noLikes)
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
     expect(response.body.likes).toBe(0);
+    const blogsAtEnd = await blogsInDb();
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length + 1);
   });
 
   test("creation fail with proper statuscode and message if blog doesn't have an url or title", async () => {
@@ -204,10 +204,41 @@ describe("validation of a blog", () => {
 describe("deletion of a blog", () => {
   test("remotion succeed", async () => {
     const blogsAtStart = await blogsInDb();
-    const blogId = blogsAtStart[blogsAtStart.length - 1].id;
-    await api.delete(`/api/blogs/${blogId}`).expect(204);
+    const blogId = blogsAtStart[blogsAtStart.length - 1].id.toString();
+
+    const result = await api
+      .post("/api/login")
+      .send({ username: "root", password: "sekret" })
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    await api
+      .delete(`/api/blogs/${blogId}`)
+      .set("Authorization", `bearer ${result.body.token}`)
+      .expect(204);
+
     const blogsAtEnd = await blogsInDb();
     expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1);
+  });
+
+  test("remotion unauthorized", async () => {
+    const blogsAtStart = await blogsInDb();
+    const blogId = blogsAtStart[blogsAtStart.length - 2].id.toString();
+
+    const result = await api
+      .post("/api/login")
+      .send({ username: "root", password: "sekret" })
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    await api
+      .delete(`/api/blogs/${blogId}`)
+      .set("Authorization", `bearer ${result.body.token}`)
+      .expect(401)
+      .expect({error: "Unauthorized user for this blog"});
+
+    const blogsAtEnd = await blogsInDb();
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length);
   });
 });
 
