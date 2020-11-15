@@ -8,6 +8,8 @@ const Login = (props) => {
     event.preventDefault();
     try {
       const user = await loginService.login({ username, password });
+      window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
+
       setUser(user);
       setUsername("");
       setPassword("");
