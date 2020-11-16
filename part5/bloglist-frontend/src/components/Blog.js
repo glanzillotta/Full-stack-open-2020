@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import blogService from "../services/blogs";
 
 const Blog = (props) => {
   const { blog } = props;
@@ -10,7 +11,15 @@ const Blog = (props) => {
     setVisible(!visible);
   };
 
-  const handleLikes = () => {};
+  const handleLikes = async () => {
+    const updatedBlog = {
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: ++blog.likes,
+    };
+    await blogService.update(blog.id, updatedBlog);
+  };
 
   return (
     <div style={border}>
