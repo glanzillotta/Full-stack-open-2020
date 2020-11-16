@@ -19,21 +19,34 @@ const Blog = (props) => {
       url: blog.url,
       likes: ++blog.likes,
     };
+<<<<<<< HEAD
     try {
       await blogService.update(blog.id, updatedBlog);
     } catch (exception) {
       setMessage([exception.message, "fail"]);
+=======
+    try{
+    await blogService.update(blog.id, updatedBlog);
+    console.log(window.location);
+    }catch(exception){
+      setMessage([exception.message, "fail"])
+>>>>>>> 1c99f549f8568ce76bde2c296c4cb71168a0c43f
     }
   };
 
   const handleRemove = async () => {
     try {
+<<<<<<< HEAD
       if (
         window.confirm(
           `Are you sure you want to remove ${blog.title} by ${blog.author}`
         )
       )
         await blogService.remove(blog.id);
+=======
+      if(window.confirm(`Are you sure you want to remove ${blog.title} by ${blog.author}`))
+      await blogService.remove(blog.id);
+>>>>>>> 1c99f549f8568ce76bde2c296c4cb71168a0c43f
     } catch (exception) {
       setMessage([exception.message, "fail"]);
     }
