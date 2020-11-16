@@ -1,28 +1,28 @@
-import React, { useState, useEffect, useRef } from "react";
-import Blog from "./components/Blog";
-import blogService from "./services/blogs";
-import Login from "./components/Login";
-import FormBlog from "./components/FormBlog";
-import Notification from "./components/Notification";
-import Togglable from "./components/Togglable";
+import React, { useState, useEffect, useRef } from 'react'
+import Blog from './components/Blog'
+import blogService from './services/blogs'
+import Login from './components/Login'
+import FormBlog from './components/FormBlog'
+import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [user, setUser] = useState(null);
-  const [message, setMessage] = useState([]);
-  const blogFormRef = useRef();
+  const [blogs, setBlogs] = useState([])
+  const [user, setUser] = useState(null)
+  const [message, setMessage] = useState([])
+  const blogFormRef = useRef()
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, [blogs.length]);
+    blogService.getAll().then((blogs) => setBlogs(blogs))
+  }, [blogs.length])
 
   if (user === null) {
     return (
@@ -31,23 +31,23 @@ const App = () => {
         <Notification message={message} setMessage={setMessage} />
         <Login setUser={setUser} setMessage={setMessage} />
       </div>
-    );
+    )
   } else {
     return (
       <div>
         <h2>blogs</h2>
         <Notification message={message} setMessage={setMessage} />
-        <Togglable buttonLabel={"new note"} ref={blogFormRef}>
+        <Togglable buttonLabel={'new note'} ref={blogFormRef}>
           <FormBlog setMessage={setMessage} blogFormRef={blogFormRef} />
         </Togglable>
         <p>
-          {user.name} logged in{" "}
+          {user.name} logged in{' '}
           <input
             type="button"
             value="log out"
             onClick={() => {
-              window.localStorage.clear();
-              window.location.reload();
+              window.localStorage.clear()
+              window.location.reload()
             }}
           />
         </p>
@@ -58,8 +58,8 @@ const App = () => {
             <Blog key={blog.id} blog={blog} setMessage={setMessage} />
           ))}
       </div>
-    );
+    )
   }
-};
+}
 
-export default App;
+export default App

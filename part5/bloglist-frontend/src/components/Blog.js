@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import blogService from "../services/blogs";
-import PropTypes from "prop-types";
+import React, { useState } from 'react'
+import blogService from '../services/blogs'
+import PropTypes from 'prop-types'
 
 const Blog = (props) => {
-  const { blog, setMessage } = props;
-  const [visible, setVisible] = useState(false);
-  const hide = { display: visible ? "" : "none" };
-  const border = { border: "1px solid", margin: "2px" };
+  const { blog, setMessage } = props
+  const [visible, setVisible] = useState(false)
+  const hide = { display: visible ? '' : 'none' }
+  const border = { border: '1px solid', margin: '2px' }
 
   const toggleVisibility = () => {
-    setVisible(!visible);
-  };
+    setVisible(!visible)
+  }
 
   const handleLikes = async () => {
     const updatedBlog = {
@@ -18,48 +18,35 @@ const Blog = (props) => {
       author: blog.author,
       url: blog.url,
       likes: ++blog.likes,
-    };
-<<<<<<< HEAD
-    try {
-      await blogService.update(blog.id, updatedBlog);
-    } catch (exception) {
-      setMessage([exception.message, "fail"]);
-=======
-    try{
-    await blogService.update(blog.id, updatedBlog);
-    console.log(window.location);
-    }catch(exception){
-      setMessage([exception.message, "fail"])
->>>>>>> 1c99f549f8568ce76bde2c296c4cb71168a0c43f
     }
-  };
+    try {
+      await blogService.update(blog.id, updatedBlog)
+    } catch (exception) {
+      setMessage([exception.message, 'fail'])
+    }
+  }
 
   const handleRemove = async () => {
     try {
-<<<<<<< HEAD
       if (
         window.confirm(
           `Are you sure you want to remove ${blog.title} by ${blog.author}`
         )
       )
-        await blogService.remove(blog.id);
-=======
-      if(window.confirm(`Are you sure you want to remove ${blog.title} by ${blog.author}`))
-      await blogService.remove(blog.id);
->>>>>>> 1c99f549f8568ce76bde2c296c4cb71168a0c43f
+        await blogService.remove(blog.id)
     } catch (exception) {
-      setMessage([exception.message, "fail"]);
+      setMessage([exception.message, 'fail'])
     }
-  };
+  }
 
   return (
     <div style={border}>
-      {blog.title} {blog.author}{" "}
+      {blog.title} {blog.author}{' '}
       <input type="button" value="view" onClick={toggleVisibility} />
       <div style={hide}>
         {blog.url}
         <div>
-          {blog.likes}{" "}
+          {blog.likes}{' '}
           <input type="button" value="like" onClick={handleLikes} />
         </div>
         {blog.user !== undefined && blog.user.username}
@@ -68,12 +55,12 @@ const Blog = (props) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   setMessage: PropTypes.func.isRequired,
-};
+}
 
-export default Blog;
+export default Blog

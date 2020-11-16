@@ -1,49 +1,49 @@
-import React, { useState } from "react";
-import blogService from "../services/blogs";
+import React, { useState } from 'react'
+import blogService from '../services/blogs'
 
 const FormBlog = (props) => {
-  const { setMessage, blogFormRef } = props;
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
+  const { setMessage, blogFormRef } = props
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
 
   const handleNewBlog = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
     try {
-      await blogService.create({ title, author, url });
-      blogFormRef.current.toggleVisibility();
+      await blogService.create({ title, author, url })
+      blogFormRef.current.toggleVisibility()
       setMessage([
         `a new blog ${title} by ${author} has been added`,
-        "success",
-      ]);
-      setTitle("");
-      setAuthor("");
-      setUrl("");
+        'success',
+      ])
+      setTitle('')
+      setAuthor('')
+      setUrl('')
     } catch (exception) {
-      setMessage([exception.message, "fail"]);
+      setMessage([exception.message, 'fail'])
     }
-  };
+  }
 
   return (
     <div>
       <h2>create new</h2>
       <form onSubmit={handleNewBlog}>
         <div>
-          title:{" "}
+          title:{' '}
           <input
             type="text"
             onChange={({ target }) => setTitle(target.value)}
           />
         </div>
         <div>
-          author:{" "}
+          author:{' '}
           <input
             type="text"
             onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
         <div>
-          url:{" "}
+          url:{' '}
           <input type="text" onChange={({ target }) => setUrl(target.value)} />
         </div>
         <div>
@@ -51,7 +51,7 @@ const FormBlog = (props) => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default FormBlog;
+export default FormBlog
