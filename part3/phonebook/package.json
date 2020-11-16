@@ -20,9 +20,11 @@
     "build:ui": "rm -rf build && cd ../../part2/phonebook && yarn run build && cp -r build ../../part3/phonebook ",
     "logs:prod": "heroku logs --tail",
     "deploy": "git push heroku master",
-    "deploy:full": "yarn run build:id && git add . && git commit -m uibuild && yarn run deploy"
+    "deploy:full": "yarn run build:id && git add . && git commit -m uibuild && yarn run deploy",
+    "lint":"eslint ."
   },
   "devDependencies": {
+    "eslint": "^7.13.0",
     "nodemon": "^2.0.4"
   },
   "engines": {
