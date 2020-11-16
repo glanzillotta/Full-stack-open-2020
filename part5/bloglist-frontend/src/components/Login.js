@@ -3,7 +3,7 @@ import loginService from "../services/login";
 import blogService from "../services/blogs";
 
 const Login = (props) => {
-  const { setUser } = props;
+  const { setUser, setMessage } = props;
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -17,12 +17,13 @@ const Login = (props) => {
       setUser(user);
       setUsername("");
       setPassword("");
-    } catch (exception) {}
+    } catch (exception) {
+      setMessage(["Wrong username or password", "fail"]);
+    }
   };
 
   return (
     <div>
-      <h2>Log in to application</h2>
       <form onSubmit={handleLogin}>
         <div>
           username:{" "}

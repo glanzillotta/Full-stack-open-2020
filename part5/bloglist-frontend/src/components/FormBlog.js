@@ -1,17 +1,23 @@
 import React, { useState } from "react";
 import blogService from "../services/blogs";
 
-const FormBlog = () => {
+const FormBlog = (props) => {
+  const { setMessage } = props;
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
 
   const handleNewBlog = async (event) => {
     event.preventDefault();
-    await blogService.create({ title, author, url });
-    setTitle("");
-    setAuthor("");
-    setUrl("");
+    try {
+      await blogService.create({ title, author, url });
+      setMessage([`a new blog ${title} by ${author} has been added`, "success"]);
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+    } catch (exception) {
+      setMessage([exception, "fail"]);
+    }
   };
 
   return (
