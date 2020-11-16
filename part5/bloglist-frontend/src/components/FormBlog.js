@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import blogService from "../services/blogs";
 
 const FormBlog = (props) => {
-  const { setMessage } = props;
+  const { setMessage, blogFormRef } = props;
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
@@ -11,12 +11,16 @@ const FormBlog = (props) => {
     event.preventDefault();
     try {
       await blogService.create({ title, author, url });
-      setMessage([`a new blog ${title} by ${author} has been added`, "success"]);
+      blogFormRef.current.toggleVisibility();
+      setMessage([
+        `a new blog ${title} by ${author} has been added`,
+        "success",
+      ]);
       setTitle("");
       setAuthor("");
       setUrl("");
     } catch (exception) {
-      setMessage([exception, "fail"]);
+      setMessage([exception.message, "fail"]);
     }
   };
 
