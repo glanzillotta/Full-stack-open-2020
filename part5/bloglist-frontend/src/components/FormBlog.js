@@ -1,24 +1,28 @@
 import React, { useState } from 'react'
 import blogService from '../services/blogs'
+import PropTypes from 'prop-types'
 
 const FormBlog = (props) => {
-  const { setMessage, blogFormRef } = props
+  const { setMessage, blogFormRef, setBlogs, blogs } = props
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
   const handleNewBlog = async (event) => {
-    event.preventDefault()
+    setMessage()
     try {
-      await blogService.create({ title, author, url })
+      event.preventDefault()
+      const newBlog = { title: title, author: author, url: url }
+      await blogService.create(newBlog)
       blogFormRef.current.toggleVisibility()
       setMessage([
         `a new blog ${title} by ${author} has been added`,
-        'success',
+        'success'
       ])
       setTitle('')
       setAuthor('')
       setUrl('')
+      setBlogs([...blogs, newBlog])
     } catch (exception) {
       setMessage([exception.message, 'fail'])
     }
@@ -31,6 +35,7 @@ const FormBlog = (props) => {
         <div>
           title:{' '}
           <input
+            name="title"
             type="text"
             onChange={({ target }) => setTitle(target.value)}
           />
@@ -38,13 +43,14 @@ const FormBlog = (props) => {
         <div>
           author:{' '}
           <input
+            name="author"
             type="text"
             onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
         <div>
           url:{' '}
-          <input type="text" onChange={({ target }) => setUrl(target.value)} />
+          <input name="url" type="text" onChange={({ target }) => setUrl(target.value)} />
         </div>
         <div>
           <input type="submit" value="create" />
@@ -52,6 +58,13 @@ const FormBlog = (props) => {
       </form>
     </div>
   )
+}
+
+FormBlog.propTypes = {
+  blogFormRef: PropTypes.func.isRequired,
+  setMessage: PropTypes.func.isRequired,
+  setBlogs: PropTypes.func.isRequired,
+  blogs: PropTypes.object.isRequired,
 }
 
 export default FormBlog

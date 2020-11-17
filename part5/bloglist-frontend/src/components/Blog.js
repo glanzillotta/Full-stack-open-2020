@@ -3,7 +3,7 @@ import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
 const Blog = (props) => {
-  const { blog, setMessage } = props
+  const { blog, setMessage, setBlogs, blogs } = props
   const [visible, setVisible] = useState(false)
   const hide = { display: visible ? '' : 'none' }
   const border = { border: '1px solid', margin: '2px' }
@@ -13,14 +13,13 @@ const Blog = (props) => {
   }
 
   const handleLikes = async () => {
-    const updatedBlog = {
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: ++blog.likes,
-    }
     try {
+      const index = blogs.findIndex(b => b.id === blog.id)
+      const updatedBlog = blogs[index]
+      updatedBlog.likes++
       await blogService.update(blog.id, updatedBlog)
+      blogs[index]=updatedBlog
+      setBlogs(blogs)
     } catch (exception) {
       setMessage([exception.message, 'fail'])
     }
@@ -45,7 +44,7 @@ const Blog = (props) => {
       <input type="button" value="view" onClick={toggleVisibility} />
       <div style={hide} className="detail">
         {blog.url}
-        <div>
+        <div className="likes">
           {blog.likes}{' '}
           <input type="button" value="like" onClick={handleLikes} />
         </div>
@@ -60,7 +59,9 @@ const Blog = (props) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  //setMessage: PropTypes.func.isRequired,
+  setMessage: PropTypes.func.isRequired,
+  setBlogs: PropTypes.func.isRequired,
+  blogs: PropTypes.object.isRequired,
 }
 
 export default Blog

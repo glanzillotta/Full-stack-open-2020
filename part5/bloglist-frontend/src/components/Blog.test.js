@@ -11,10 +11,12 @@ describe('<Blog />', () => {
     likes: 3
   }
   let component
+  const mock = jest.fn()
+  const mockClick = jest.fn()
 
   beforeEach(() => {
     component = render(
-      <Blog blog={blog} />
+      <Blog blog={blog} setMessage={mockClick} setBlogs={mock} blogs={{}} />
     )
   })
 
@@ -28,10 +30,18 @@ describe('<Blog />', () => {
     const div = component.container.querySelector('.detail')
     expect(div).toHaveStyle('display: none')
   })
-  test('clicking the button calls event handler once', () => {
+
+  test('clicking the view button the detail are displayed', () => {
     const button = component.getByText('view')
     fireEvent.click(button)
     const div = component.container.querySelector('.detail')
     expect(div).not.toHaveStyle('display: none')
+  })
+
+  test('clicking the like button twice', () => {
+    const like= component.getByText('like')
+    fireEvent.click(like)
+    fireEvent.click(like)
+    expect(mockClick.mock.calls).toHaveLength(2)
   })
 })
