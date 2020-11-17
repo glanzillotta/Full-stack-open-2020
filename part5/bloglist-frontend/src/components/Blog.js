@@ -43,7 +43,7 @@ const Blog = (props) => {
     <div style={border}>
       {blog.title} {blog.author}{' '}
       <input type="button" value="view" onClick={toggleVisibility} />
-      <div style={hide}>
+      <div style={hide} className="detail">
         {blog.url}
         <div>
           {blog.likes}{' '}
@@ -60,7 +60,7 @@ const Blog = (props) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  setMessage: PropTypes.func.isRequired,
+  //setMessage: PropTypes.func.isRequired,
 }
 
 export default Blog
