@@ -1,6 +1,6 @@
 import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
-import { render } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import Blog from './Blog'
 
 describe('<Blog />', () => {
@@ -28,5 +28,10 @@ describe('<Blog />', () => {
     const div = component.container.querySelector('.detail')
     expect(div).toHaveStyle('display: none')
   })
-
+  test('clicking the button calls event handler once', () => {
+    const button = component.getByText('view')
+    fireEvent.click(button)
+    const div = component.container.querySelector('.detail')
+    expect(div).not.toHaveStyle('display: none')
+  })
 })
