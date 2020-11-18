@@ -18,7 +18,7 @@ const Notification = (props) => {
 
   setTimeout(() => setMessage([]), 5000)
 
-  return <div style={style}>{message[0]}</div>
+  return <div style={style} name="message">{message[0]}</div>
 }
 
 Notification.propTypes = {

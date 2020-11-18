@@ -41,7 +41,7 @@ const App = () => {
           <FormBlog setMessage={setMessage} blogFormRef={blogFormRef} blogs={[...blogs]} setBlogs={setBlogs} />
         </Togglable>
         <p>
-          {user.name} logged in{' '}
+          {user.name || user.username} logged in{' '}
           <input
             type="button"
             value="log out"
