@@ -9,7 +9,6 @@ const FormBlog = (props) => {
   const [url, setUrl] = useState('')
 
   const handleNewBlog = async (event) => {
-    setMessage()
     try {
       event.preventDefault()
       const newBlog = { title: title, author: author, url: url }
@@ -53,7 +52,7 @@ const FormBlog = (props) => {
           <input name="url" type="text" onChange={({ target }) => setUrl(target.value)} />
         </div>
         <div>
-          <input type="submit" value="create" />
+          <input type="submit" value="create" name="create" />
         </div>
       </form>
     </div>
