@@ -3,7 +3,7 @@ import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
 const FormBlog = (props) => {
-  const { setMessage, blogFormRef, setBlogs, blogs } = props
+  const { setMessage, blogFormRef, setBlogs } = props
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
@@ -21,7 +21,7 @@ const FormBlog = (props) => {
       setTitle('')
       setAuthor('')
       setUrl('')
-      setBlogs([...blogs, newBlog])
+      blogService.getAll().then((blogs) => setBlogs(blogs))
     } catch (exception) {
       setMessage([exception.message, 'fail'])
     }
@@ -60,10 +60,9 @@ const FormBlog = (props) => {
 }
 
 FormBlog.propTypes = {
-  blogFormRef: PropTypes.func.isRequired,
+  blogFormRef: PropTypes.object.isRequired,
   setMessage: PropTypes.func.isRequired,
   setBlogs: PropTypes.func.isRequired,
-  blogs: PropTypes.object.isRequired,
 }
 
 export default FormBlog

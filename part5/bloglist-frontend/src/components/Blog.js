@@ -39,14 +39,14 @@ const Blog = (props) => {
   }
 
   return (
-    <div style={border}>
+    <div style={border} id="blog">
       {blog.title} {blog.author}{' '}
-      <input type="button" value="view" onClick={toggleVisibility} />
+      <input type="button" id="view" value="view" onClick={toggleVisibility} />
       <div style={hide} className="detail">
         {blog.url}
         <div className="likes">
           {blog.likes}{' '}
-          <input type="button" value="like" onClick={handleLikes} />
+          <input type="button" id="like" value="like" onClick={handleLikes} />
         </div>
         {blog.user !== undefined && blog.user.username}
         <div>
@@ -61,7 +61,7 @@ Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   setMessage: PropTypes.func.isRequired,
   setBlogs: PropTypes.func.isRequired,
-  blogs: PropTypes.object.isRequired,
+  blogs: PropTypes.array.isRequired,
 }
 
 export default Blog

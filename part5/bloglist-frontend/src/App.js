@@ -39,7 +39,7 @@ const App = () => {
         <h2>blogs</h2>
         <Notification message={message} setMessage={setMessage} />
         <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
-          <FormBlog setMessage={setMessage} blogFormRef={blogFormRef} blogs={[...blogs]} setBlogs={setBlogs} />
+          <FormBlog setMessage={setMessage} blogFormRef={blogFormRef} setBlogs={setBlogs} />
         </Togglable>
         <p>
           {user.name || user.username} logged in{' '}
