@@ -33,6 +33,7 @@ const Blog = (props) => {
         )
       )
         await blogService.remove(blog.id)
+        setMessage([`The blog ${blog.title} has been removed`,'success'])
     } catch (exception) {
       setMessage([exception.message, 'fail'])
     }
@@ -50,7 +51,7 @@ const Blog = (props) => {
         </div>
         {blog.user !== undefined && blog.user.username}
         <div>
-          <input type="button" value="remove" onClick={handleRemove} />
+          <input type="button" id="remove" value="remove" onClick={handleRemove} />
         </div>
       </div>
     </div>
