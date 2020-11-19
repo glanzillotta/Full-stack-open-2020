@@ -31,15 +31,11 @@ describe('Blog app', function () {
     })
   })
 
-  describe.only('When logged in', function () {
+  describe('When logged in', function () {
     beforeEach(function () {
-      cy.request('POST', 'http://localhost:3001/api/login', {
-        username: 'root', password: 'sekret'
+      cy.login({
+        username: 'root', password:'sekret'
       })
-        .then(response => {
-          localStorage.setItem('loggedBlogAppUser', JSON.stringify(response.body))
-          cy.visit('http://localhost:3000')
-        })
     })
 
     it('A blog can be created', function () {
@@ -54,17 +50,10 @@ describe('Blog app', function () {
 
     describe('when created a blog', function () {
       beforeEach(function () {
-        cy.request({
-          method: 'POST',
-          url: 'http://localhost:3001/api/blogs',
-          body: {
-            author: 'new author',
-            title: 'new title',
-            url: 'new url'
-          },
-          headers: {
-            'Authorization': `bearer ${JSON.parse(localStorage.getItem('loggedBlogAppUser')).token}`
-          }
+        cy.createBlog({
+          title: 'new title',
+          author:'new author',
+          url:'new url'
         })
         cy.visit('http://localhost:3000')
       })
@@ -82,7 +71,7 @@ describe('Blog app', function () {
         cy.get('[name="message"]').should('contain', 'The blog new title has been removed').and('have.css', 'color', 'rgb(0, 128, 0)')
       })
 
-      it.only('error deleting a blog', function () {
+      it('error deleting a blog', function () {
         localStorage.clear()
         const newUser = {
           username: 'bunker',
@@ -101,5 +90,39 @@ describe('Blog app', function () {
         cy.get('[name="message"]').should('contain', '401').and('have.css', 'color', 'rgb(255, 0, 0)')
       })
     })
+
+    describe('when created multiple blogs', function () {
+      beforeEach(function () {
+        cy.login({ username:'root', password:'sekret' })
+        for (let i = 1; i < 5; i++) {
+          cy.createBlog({
+            title: `blog ${i}`,
+            url: `url ${i}`,
+            author: `author ${i}`,
+            likes: i,
+          })
+        }
+        cy.visit('http://localhost:3000')
+      })
+
+      it.only('if blogs are sorted by likes', function () {
+        const likesArr = []
+        for (let i = 1; i < 5; i++) {
+          cy.contains(`blog ${i}`).children('#view').click()
+        }
+
+        cy.get('.likes')
+          .then((arr) => {
+            for (let i = 0; i < arr.length; i++) {
+              likesArr.push(Number(arr[i].innerHTML))
+            }
+          })
+          .then(() => {
+            const sortedLikes = likesArr.sort((a, b) => b - a)
+            expect(likesArr === sortedLikes).to.be.true
+          })
+      })
+    })
+
   })
 })

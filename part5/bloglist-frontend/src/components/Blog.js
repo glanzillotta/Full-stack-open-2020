@@ -33,7 +33,7 @@ const Blog = (props) => {
         )
       )
         await blogService.remove(blog.id)
-        setMessage([`The blog ${blog.title} has been removed`,'success'])
+      setMessage([`The blog ${blog.title} has been removed`,'success'])
     } catch (exception) {
       setMessage([exception.message, 'fail'])
     }
