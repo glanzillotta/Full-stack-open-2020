@@ -7,7 +7,7 @@ const AnecdoteList = () => {
     const anecdotes = useSelector(state => {
         if (state.filter === 'ALL')
             return state.anecdotes
-        else return state.anecdotes.filter(anecdote=> anecdote.content.includes(state.filter)?anecdote:null)
+        else return state.anecdotes.filter(anecdote => anecdote.content.includes(state.filter) ? anecdote : null)
     })
     const dispatch = useDispatch()
 
