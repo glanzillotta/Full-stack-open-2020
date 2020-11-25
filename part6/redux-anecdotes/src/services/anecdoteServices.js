@@ -9,10 +9,15 @@ const getAll = async () => {
 
 const getId = () => (100000 * Math.random()).toFixed(0)
 
-const create = async (anecdote) => {
-  const obj = { anecdote, vote: 0, id: getId() }
+const create = async (content) => {
+  const obj = { content, vote: 0, id: getId() }
   const response = await axios.post(baseUrl, obj)
   return response.data
 }
 
-export default { getAll, create }
+const update = async (updatedBlog) => {
+  const response = await axios.put(`${baseUrl}/${updatedBlog.id}`, updatedBlog)
+  return response.data
+}
+
+export default { getAll, create, update }
