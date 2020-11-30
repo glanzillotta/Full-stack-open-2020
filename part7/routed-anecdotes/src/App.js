@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import {
   BrowserRouter as Router,
-  Switch, Route, Link, useRouteMatch
+  Switch, Route, Link, useRouteMatch, Redirect
 } from "react-router-dom"
 
 const AnecdoteList = ({ anecdotes }) => (
@@ -56,6 +56,8 @@ const CreateNew = (props) => {
       info,
       votes: 0
     })
+    props.setNotification(`a new anecdote ${content} created`)
+    setTimeout(() => {props.setNotification()},10000)
   }
 
   return (
@@ -115,6 +117,10 @@ const App = () => {
   const padding = {
     paddingRight: 5
   }
+  const styleNotification ={
+    border: '2px solid red',
+    width: 'max-content'
+  }
 
   const match = useRouteMatch('/anecdotes/:id')
 
@@ -145,16 +151,18 @@ const App = () => {
       <Router>
         <div>
           <Link style={padding} to="/">anecdotes</Link>
-          <Link style={padding} to="/create">create new</Link>
+          <Link style={padding} to="/create" onClick={()=>setNotification()}>create new</Link>
           <Link style={padding} to="/about">about</Link>
         </div>
+
+        {notification?<div style={styleNotification}>{notification}</div>:null}
 
         <Switch>
           <Route path="/anecdotes/:id">
             <Anecdote anecdote={anecdote} />
           </Route>
           <Route path="/create">
-            <CreateNew addNew={addNew} />
+            {notification?<Redirect to="/" />:<CreateNew addNew={addNew} setNotification={setNotification} />}
           </Route>
           <Route path="/about">
             <About />
