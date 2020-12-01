@@ -6,15 +6,15 @@ export const useField = (type) => {  const [value, setValue] = useState('')
     setValue(event.target.value)
   }
 
-  const onReset = (event) => {
+  const reset = (event) => {
         setValue('')
   }
 
   return {
-    type,
+    reset,
+    input:{type,
     value,
-    onChange,
-    onReset
+    onChange}
   }
 }
 

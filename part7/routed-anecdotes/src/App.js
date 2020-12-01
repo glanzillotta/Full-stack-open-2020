@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import {
   BrowserRouter as Router,
-  Switch, Route, Link, useRouteMatch, Redirect
+  Switch, Route, Link, useRouteMatch, useHistory
 } from "react-router-dom"
 import  { useField } from './hooks'
 
@@ -47,23 +47,25 @@ const CreateNew = (props) => {
   const content=useField('text')
   const author=useField('text')
   const info=useField('text')
-
+  const history=useHistory()
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
-      content:content.value,
-      author: author.value,
-      info: info.value,
+      content:content.input.value,
+      author: author.input.value,
+      info: info.input.value,
       votes: 0
     })
-    props.setNotification(`a new anecdote ${content.value} created`)
+    history.push('/')
+    props.setNotification(`a new anecdote ${content.input.value} created`)
     setTimeout(() => {props.setNotification()},10000)
   }
 
+
 const handleReset=() => {
-  content.onReset()
-  author.onReset()
-  info.onReset()
+  content.reset()
+  author.reset()
+  info.reset()
 }
 
   return (
@@ -72,15 +74,15 @@ const handleReset=() => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' {...content} />
+          <input name='content' {...content.input} />
         </div>
         <div>
           author
-          <input name='author' {...author} />
+          <input name='author' {...author.input} />
         </div>
         <div>
           url for more info
-          <input name='info' {...info} />
+          <input name='info' {...info.input} />
         </div>
         <button>create</button>
         <input type='button' value='reset' onClick={handleReset} />
@@ -169,7 +171,7 @@ const App = () => {
             <Anecdote anecdote={anecdote} />
           </Route>
           <Route path="/create">
-            {notification?<Redirect to="/" />:<CreateNew addNew={addNew} setNotification={setNotification} />}
+            {<CreateNew addNew={addNew} setNotification={setNotification} />}
           </Route>
           <Route path="/about">
             <About />
