@@ -1,57 +1,73 @@
 import blogService from '../services/blogs'
 
-const blogReducer = (state=[], action) => {
+const blogReducer = (state = [], action) => {
   switch (action.type) {
-  case 'GET':
+  case 'GET_BLOGS':
     return action.data
-  case 'CREATE':
+  case 'CREATE_BLOG':
     return [...state, action.data]
-  case 'LIKE':{
-    const updatedBlog=action.data
-    return state.map(blog => blog.id === updatedBlog.id?updatedBlog:blog)
-  } case 'DELETE':
-    return state.filter(blog => blog.id !==action.data.id)
+  case 'LIKE': {
+    const updatedBlog = action.data
+    return state.map(blog => blog.id === updatedBlog.id ? updatedBlog : blog)
+  } case 'DELETE_BLOG':
+    return state.filter(blog => blog.id !== action.data.id)
+  case 'POST_COMMENT':
+    return state.map(blog => {
+      if (blog.id === action.data.blogId)
+        blog.comments.concat(action.data.comment)
+      return blog
+    })
   default: return state
   }
 }
 
-export const getBlogs=() => {
+export const getBlogs = () => {
   return async dispatch => {
-    const blogs=await blogService.getAll()
+    const blogs = await blogService.getAll()
     dispatch({
-      type:'GET',
-      data:blogs
+      type: 'GET_BLOGS',
+      data: blogs
     })
   }
 }
 
-export const createBlog=(blog) => {
+export const createBlog = (blog) => {
   return async dispatch => {
-    const newBlog=await blogService.create(blog)
+    const newBlog = await blogService.create(blog)
     dispatch({
-      type:'CREATE',
-      data:newBlog
+      type: 'CREATE_BLOG',
+      data: newBlog
     })
   }
 }
 
-export const likeBlog=(blog) => {
+export const likeBlog = (blog) => {
   return async dispatch => {
-    const liked={ ...blog,likes:++blog.likes }
-    const updatedBlog=await blogService.update(liked)
+    const liked = { ...blog, likes: ++blog.likes }
+    const updatedBlog = await blogService.update(liked)
     dispatch({
-      type:'LIKE',
-      data:updatedBlog
+      type: 'LIKE',
+      data: updatedBlog
     })
   }
 }
 
-export const deleteBlog =(id) => {
+export const deleteBlog = (id) => {
   return async dispatch => {
     await blogService.remove(id)
     dispatch({
-      type:'DELETE',
+      type: 'DELETE_BLOG',
       data: { id }
+    })
+  }
+}
+
+export const postComment = (blogId, comment) => {
+  return async dispatch => {
+    await blogService.addComment(blogId, comment)
+    dispatch({
+      type: 'POST_COMMENT',
+      data: { blogId, comment }
     })
   }
 }

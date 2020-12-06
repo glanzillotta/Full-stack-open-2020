@@ -1,45 +1,20 @@
-import loginService from '../services/login'
-import blogService from '../services/blogs'
+import userService from '../services/users'
 
-const userReducer = (state = null, action) => {
+const userReducer = (state=[], action) => {
   switch (action.type) {
-  case 'LOGIN':
-    return action.data.user
-  case 'LOGOUT':
-    window.localStorage.clear()
-    return null
-  case 'CHECK':
-    return action.data.user
+  case 'GET_USERS':
+    return action.data
   default: return state
   }
 }
 
-export const loginUser = (credentials) => {
+export const getUsers = () => {
   return async dispatch => {
-    const user = await loginService.login(credentials)
-    window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
-    blogService.setToken(user.token)
+    const users = await userService.getUsers()
     dispatch({
-      type: 'LOGIN',
-      data: { user }
+      type: 'GET_USERS',
+      data: users
     })
-  }
-}
-
-export const logoutUser = () => {
-  return {
-    type: 'LOGOUT'
-  }
-}
-
-export const loginCheck = () => {
-  const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-  let user=null
-  if (loggedUserJSON)
-    user=JSON.parse(loggedUserJSON)
-  return {
-    type: 'CHECK',
-    data: { user }
   }
 }
 
