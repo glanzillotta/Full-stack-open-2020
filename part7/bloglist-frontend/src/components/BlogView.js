@@ -3,6 +3,8 @@ import { useRouteMatch } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
 import { likeBlog, postComment } from '../reducers/blogReducer'
+import Form from 'react-bootstrap/Form'
+import Button from 'react-bootstrap/Button'
 
 const BlogView = () => {
   const match = useRouteMatch('/blogs/:id')
@@ -21,18 +23,6 @@ const BlogView = () => {
       dispatch(setNotification(exception.message, true, 5))
     }
   }
-
-  /*const handleRemove = async () => {
-      try {
-        if (window.confirm(`Are you sure you want to remove ${blog.title} by ${blog.author}`)) {
-          dispatch(setNotification(`The blog ${blog.title} has been removed`, false, 5))
-          dispatch(deleteBlog(blog.id))
-        }
-      } catch (exception) {
-        dispatch(setNotification(exception.message, true, 5))
-      }
-    }*/
-
   const handleSubmit = () => {
     dispatch(postComment(blog.id, comment))
   }
@@ -40,17 +30,19 @@ const BlogView = () => {
   return (
     <div>
       <h1>{blog.title}</h1>
-      <div>{blog.url}</div>
-      <div>{blog.likes}<button onClick={handleLikes}>like</button></div>
-      <div>Added by {blog.user ? blog.user.name || blog.user.username : 'Anonymous'}</div>
-      <h3>Comments</h3>
-      <form onSubmit={handleSubmit}>
-        <input type="text" onChange={(e) => setComment(e.target.value)} />
-        <input type="submit" value="add comment" />
-      </form>
-      {blog.comments?<ul>
+      <p>{blog.url}</p>
+      <p>{blog.likes}<Button onClick={handleLikes}>Like</Button></p>
+      <p>Added by {blog.user ? blog.user.name || blog.user.username : 'Anonymous'}</p>
+      <h4>Comments</h4>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group>
+          <Form.Control placeholder="Comment" type="text" onChange={(e) => setComment(e.target.value)} />
+          <Button type="submit">Add comment</Button>
+        </Form.Group>
+      </Form>
+      {blog.comments ? <ul>
         {blog.comments.map((comment) => <li key={comment}>{comment}</li>)}
-      </ul>:null}
+      </ul> : null}
     </div>
   )
 }

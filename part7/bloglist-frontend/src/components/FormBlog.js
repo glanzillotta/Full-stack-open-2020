@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { Form, Button } from 'react-bootstrap'
 import { createBlog } from '../reducers/blogReducer'
 import PropTypes from 'prop-types'
 import { setNotification } from '../reducers/notificationReducer'
@@ -16,7 +17,7 @@ const FormBlog = (props) => {
       event.preventDefault()
       const newBlog = { title: title, author: author, url: url }
       dispatch(createBlog(newBlog))
-      dispatch(setNotification(`a new blog ${title} by ${author} has been added`,false, 5))
+      dispatch(setNotification(`a new blog ${title} by ${author} has been added`, false, 5))
       setTitle('')
       setAuthor('')
       setUrl('')
@@ -27,34 +28,29 @@ const FormBlog = (props) => {
   }
 
   return (
-    <div>
-      <h2>create new</h2>
-      <form onSubmit={handleNewBlog}>
-        <div>
-          title:{' '}
-          <input
-            name="title"
-            type="text"
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          author:{' '}
-          <input
-            name="author"
-            type="text"
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url:{' '}
-          <input name="url" type="text" onChange={({ target }) => setUrl(target.value)} />
-        </div>
-        <div>
-          <input type="submit" value="create" name="create" />
-        </div>
-      </form>
-    </div>
+    <Form>
+      <Form.Group>
+        <Form.Label>title:</Form.Label>
+        <Form.Control
+          placeholder="Title"
+          name="title"
+          onChange={({ target }) => setTitle(target.value)}
+        />
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>author:</Form.Label>
+        <Form.Control
+          placeholder="Author"
+          name="author"
+          onChange={({ target }) => setAuthor(target.value)}
+        />
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>url:</Form.Label>
+        <Form.Control placeholder="URL" name="url" onChange={({ target }) => setUrl(target.value)} />
+      </Form.Group>
+      <Button type="submit" name="create" onClick={handleNewBlog}>Create</Button>
+    </Form>
   )
 }
 

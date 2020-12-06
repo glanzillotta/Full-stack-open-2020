@@ -34,10 +34,11 @@ export const logoutUser = () => {
 
 export const loginCheck = () => {
   const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-  let user=null
-  if (loggedUserJSON)
-    user=JSON.parse(loggedUserJSON)
-  blogService.setToken(user.token)
+  let user = null
+  if (loggedUserJSON) {
+    user = JSON.parse(loggedUserJSON)
+    blogService.setToken(user.token)
+  }
   return {
     type: 'CHECK',
     data: { user }
