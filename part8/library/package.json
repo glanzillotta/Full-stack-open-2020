@@ -6,11 +6,12 @@
   "type": "module",
   "dependencies": {
     "apollo-server": "^2.19.0",
-    "graphql": "^15.4.0"
+    "graphql": "^15.4.0",
+    "uuid": "^8.3.1"
   },
   "devDependencies": {},
   "scripts": {
-    "start":"node library-backend.js",
+    "start": "node library-backend.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

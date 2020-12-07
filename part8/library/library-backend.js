@@ -1,4 +1,5 @@
 import { ApolloServer, gql } from 'apollo-server'
+import { v1 as uuid } from 'uuid';
 
 let authors = [
   {
@@ -100,25 +101,45 @@ const typeDefs = gql`
     allBooks(author:String, genre:String): [Book!]!
     allAuthors: [Author!]!
   }
+
+  type Mutation {
+    addBook(
+      title:String!,
+      author:String!,
+      published:Int
+      genres: [String!]!
+    ):Book
+  }
 `
 
 const resolvers = {
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
-    allBooks: (root,args) => {
+    allBooks: (root, args) => {
       if (args.genre && args.author)
-          return books.filter(book => book.genres.includes(args.genre) && book.author===args.author)
-      if(args.author)
-       return books.filter(book => book.author===args.author)
+        return books.filter(book => book.genres.includes(args.genre) && book.author === args.author)
+      if (args.author)
+        return books.filter(book => book.author === args.author)
       if (args.genre)
         return books.filter(book => book.genres.includes(args.genre))
       return books
     },
     allAuthors: () => authors
   },
-  Author:{ 
-    bookCount: (root)=> books.filter((book)=> book.author===root.name).length
+  Author: {
+    bookCount: (root) => books.filter((book) => book.author === root.name).length
+  },
+  Mutation: {
+    addBook: (root, args) => {
+      const book = { ...args, id: uuid() }
+      if (!authors.find(author => author.name === args.author)) {
+        const author = { name: args.author, id: uuid() }
+        authors = authors.concat(author)
+      }
+      books = books.concat(book)
+      return book
+    }
   }
 }
 
