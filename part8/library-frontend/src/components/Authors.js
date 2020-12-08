@@ -15,9 +15,6 @@ const Authors = (props) => {
     return null
   }
 
-  if (!data) return null
-  
-
   return (
     <div>
       <h2>authors</h2>
