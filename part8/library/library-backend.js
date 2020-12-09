@@ -1,83 +1,19 @@
-import { ApolloServer, gql } from 'apollo-server'
-import { v1 as uuid } from 'uuid';
+import { ApolloServer, UserInputError, gql } from 'apollo-server'
+import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+import Book from './models/book.js'
+import Author from './models/author.js'
 
-let authors = [
-  {
-    name: 'Robert Martin',
-    id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
-    born: 1952,
-  },
-  {
-    name: 'Martin Fowler',
-    id: "afa5b6f0-344d-11e9-a414-719c6709cf3e",
-    born: 1963
-  },
-  {
-    name: 'Fyodor Dostoevsky',
-    id: "afa5b6f1-344d-11e9-a414-719c6709cf3e",
-    born: 1821
-  },
-  {
-    name: 'Joshua Kerievsky', // birthyear not known
-    id: "afa5b6f2-344d-11e9-a414-719c6709cf3e",
-  },
-  {
-    name: 'Sandi Metz', // birthyear not known
-    id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
-  },
-]
-
-let books = [
-  {
-    title: 'Clean Code',
-    published: 2008,
-    author: 'Robert Martin',
-    id: "afa5b6f4-344d-11e9-a414-719c6709cf3e",
-    genres: ['refactoring']
-  },
-  {
-    title: 'Agile software development',
-    published: 2002,
-    author: 'Robert Martin',
-    id: "afa5b6f5-344d-11e9-a414-719c6709cf3e",
-    genres: ['agile', 'patterns', 'design']
-  },
-  {
-    title: 'Refactoring, edition 2',
-    published: 2018,
-    author: 'Martin Fowler',
-    id: "afa5de00-344d-11e9-a414-719c6709cf3e",
-    genres: ['refactoring']
-  },
-  {
-    title: 'Refactoring to patterns',
-    published: 2008,
-    author: 'Joshua Kerievsky',
-    id: "afa5de01-344d-11e9-a414-719c6709cf3e",
-    genres: ['refactoring', 'patterns']
-  },
-  {
-    title: 'Practical Object-Oriented Design, An Agile Primer Using Ruby',
-    published: 2012,
-    author: 'Sandi Metz',
-    id: "afa5de02-344d-11e9-a414-719c6709cf3e",
-    genres: ['refactoring', 'design']
-  },
-  {
-    title: 'Crime and punishment',
-    published: 1866,
-    author: 'Fyodor Dostoevsky',
-    id: "afa5de03-344d-11e9-a414-719c6709cf3e",
-    genres: ['classic', 'crime']
-  },
-  {
-    title: 'The Demon ',
-    published: 1872,
-    author: 'Fyodor Dostoevsky',
-    id: "afa5de04-344d-11e9-a414-719c6709cf3e",
-    genres: ['classic', 'revolution']
-  },
-]
+dotenv.config()
+const MONGODB_URI = process.env.MONGODB_URI
+const { connect } = mongoose
+connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
+  .then(() => {
+    console.log('connected to MongoDB')
+  })
+  .catch((error) => {
+    console.log('error connection to MongoDB:', error.message)
+  })
 
 const typeDefs = gql`
  type Author {
@@ -87,13 +23,13 @@ const typeDefs = gql`
     bookCount: Int
  }
 
- type Book{
-   title: String!
-   published: Int!
-   author: String!
-   id: ID!
-   genres: [String!]!
- }
+type Book {
+  title: String!
+  published: Int!
+  author: Author!
+  genres: [String!]!
+  id: ID!
+}
 
   type Query {
     bookCount:Int!
@@ -118,38 +54,64 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bookCount: () => books.length,
-    authorCount: () => authors.length,
-    allBooks: (root, args) => {
-      if (args.genre && args.author)
-        return books.filter(book => book.genres.includes(args.genre) && book.author === args.author)
-      if (args.author)
-        return books.filter(book => book.author === args.author)
-      if (args.genre)
-        return books.filter(book => book.genres.includes(args.genre))
-      return books
+    bookCount: () => Book.collection.countDocuments(),
+    authorCount: () => Author.collection.countDocuments(),
+    allBooks: async (root, args) => {
+      try {
+        let query = {}
+        if (args.genre && args.author) {
+          const author = await Author.findOne({ name: args.author })
+          query = { $and: [{ author: author }, { genres: { $in: args.genre } }] }
+        } else if (args.author) {
+          const author = await Author.findOne({ name: args.author })
+          query = { author: author }
+        } else if (args.genre)
+          query = { genres: { $in: args.genre } }
+        return await Book.find(query).populate('author')
+      }catch (err) {
+        throw new UserInputError(err.message, {
+          invalidArgs: args,
+        })
+      }
+
     },
-    allAuthors: () => authors
+    allAuthors: async () => await Author.find({})
   },
   Author: {
-    bookCount: (root) => books.filter((book) => book.author === root.name).length
+    bookCount: async (root) => {
+      try {
+        const author = await Author.find({ name: root.name })
+        return await Book.find({ author: author }).countDocuments()
+      } catch (err) {
+        throw new UserInputError(err.message)
+      }
+    }
   },
   Mutation: {
-    addBook: (root, args) => {
-      const book = { ...args, id: uuid() }
-      if (!authors.find(author => author.name === args.author)) {
-        const author = { name: args.author, id: uuid() }
-        authors = authors.concat(author)
+    addBook: async (root, args) => {
+      try {
+        let author = await Author.findOne({ name: args.author })
+        if (!author) {
+          author = new Author({ name: args.author })
+          await author.save()
+        }
+
+        const book = new Book({ ...args, author: author })
+        return book.save()
+      } catch (err) {
+        throw new UserInputError(err.message, {
+          invalidArgs: args,
+        })
       }
-      books = books.concat(book)
-      return book
     },
-    editAuthor: (root, args) => {
-      const author =authors.find(author => author.name === args.name)
-      if(!author) return null
-      const updatedAuthor = {...author, born: args.setBornTo}
-      authors= authors.map(author =>author.id ===updatedAuthor.id?updatedAuthor:author)
-      return updatedAuthor
+    editAuthor: async (root, args) => {
+      try {
+        return await Author.findOneAndUpdate({ name: args.name }, { name: args.name, born: args.setBornTo }, { new: true })
+      } catch (err) {
+        throw new UserInputError(err.message, {
+          invalidArgs: args,
+        })
+      }
     }
   }
 }
