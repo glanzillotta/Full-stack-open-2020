@@ -15,6 +15,14 @@ export const ALL_GENRES = gql`
     }
 `
 
+export const USER_GENRE = gql`
+    query{
+        me{
+            favoriteGenre
+        }
+    }
+`
+
 export const ALL_BOOKS = gql`
     query{
         allBooks{

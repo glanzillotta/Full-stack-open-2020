@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react'
+import { useQuery } from '@apollo/client'
+import { USER_GENRE } from './queries'
 
-const Books = ({show,books,genres}) => {
+const Books = ({show,books}) => {
   const [booksToShow, setBooksToShow] = useState([])
-  console.log(books);
-  const [filter, setFilter] = useState('')
+  const genre = useQuery(USER_GENRE)
 
   useEffect(() => {
-    if (filter) {
-      setBooksToShow(books.filter((book) => book.genres.includes(filter)))
+    if (genre.data) {
+      setBooksToShow(books.filter((book) => book.genres.includes(genre.data.me.favoriteGenre)))
     } else {
       setBooksToShow(books)
     }
-  }, [filter]) //eslint-disable-line
+  }, [genre.data]) //eslint-disable-line
 
 
   if (!show) return null
@@ -19,9 +20,9 @@ const Books = ({show,books,genres}) => {
   return (
     <div>
       <h2>books</h2>
-      {filter ? (
+      {genre ? (
         <p>
-          in genre <b>{filter}</b>
+          in genre <strong>{genre.data.me.favoriteGenre}</strong>
         </p>
       ) : null}
       <table>
@@ -44,8 +45,6 @@ const Books = ({show,books,genres}) => {
           )}
         </tbody>
       </table>
-      {genres.map((gen) => (<button key={gen} onClick={() =>setFilter(gen)}>{gen}</button>))}
-      <button key='all' onClick={() => setFilter(null)}>all genres</button>
     </div>
   )
 }
