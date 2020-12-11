@@ -1,26 +1,29 @@
 import React, { useState, useEffect } from 'react'
-import { useQuery } from '@apollo/client'
-import { USER_GENRE } from './queries'
+import { useLazyQuery, useQuery } from '@apollo/client'
+import { ALL_BOOKS_FILTERED, USER_GENRE, ALL_GENRES } from './queries'
 
-const Books = ({show,books}) => {
-  const [booksToShow, setBooksToShow] = useState([])
+const Books = ({ show }) => {
   const genre = useQuery(USER_GENRE)
+  const [getFavorites, favorites] = useLazyQuery(ALL_BOOKS_FILTERED)
+  const genres = useQuery(ALL_GENRES)
+  const [filter, setFilter] = useState('')
+  const [books, setBooks] = useState([])
+  console.log('books: ', books);
+  console.log('fa: ', favorites);
 
   useEffect(() => {
-    if (genre.data) {
-      setBooksToShow(books.filter((book) => book.genres.includes(genre.data.me.favoriteGenre)))
-    } else {
-      setBooksToShow(books)
-    }
-  }, [genre.data]) //eslint-disable-line
-
+    if (genre.data) getFavorites({ variables: { genre: genre.data.me.favoriteGenre } })
+    if(filter) getFavorites({ variables: { genre: filter } })
+    if (favorites.data) setBooks(favorites.data.allBooks)
+  }, [genre.data, favorites.data, filter]) //eslint-disable-line
 
   if (!show) return null
+  if (genre.loading || books.loading) return <div>loading...</div>
 
   return (
     <div>
       <h2>books</h2>
-      {genre ? (
+      {genre.data ? (
         <p>
           in genre <strong>{genre.data.me.favoriteGenre}</strong>
         </p>
@@ -36,7 +39,7 @@ const Books = ({show,books}) => {
               published
             </th>
           </tr>
-          {booksToShow.map(book =>
+          {books.map(book =>
             <tr key={book.title}>
               <td>{book.title}</td>
               <td>{book.author.name}</td>
@@ -45,6 +48,8 @@ const Books = ({show,books}) => {
           )}
         </tbody>
       </table>
+      {genres.data.allGenres.map((gen) => (<button key={gen} onClick={() =>setFilter(gen)}>{gen}</button>))}
+      <button key='all' onClick={() => setFilter(null)}>all genres</button>
     </div>
   )
 }
