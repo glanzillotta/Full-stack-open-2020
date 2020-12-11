@@ -48,6 +48,7 @@ type Token {
     authorCount:Int!
     allBooks(author:String, genre:String): [Book!]!
     allAuthors: [Author!]!
+    allGenres: [String!]!
     me: User
   }
 
@@ -77,6 +78,18 @@ const resolvers = {
   Query: {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
+    allGenres: async () => {
+      const books = await Book.find({})
+      let genres = []
+      books.forEach((book) => {
+        book.genres.forEach((genre) => {
+          if (!genres.includes(genre)) {
+            genres = genres.concat(genre)
+          }
+        })
+      })
+      return genres
+    },
     allBooks: async (root, args) => {
       try {
         let query = {}
