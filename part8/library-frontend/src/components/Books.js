@@ -8,8 +8,6 @@ const Books = ({ show }) => {
   const genres = useQuery(ALL_GENRES)
   const [filter, setFilter] = useState('')
   const [books, setBooks] = useState([])
-  console.log('books: ', books);
-  console.log('fa: ', favorites);
 
   useEffect(() => {
     if (genre.data) getFavorites({ variables: { genre: genre.data.me.favoriteGenre } })

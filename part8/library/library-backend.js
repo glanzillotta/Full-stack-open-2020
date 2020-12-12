@@ -1,4 +1,4 @@
-import { ApolloServer, UserInputError, AuthenticationError, gql } from 'apollo-server'
+import { ApolloServer, UserInputError, AuthenticationError, gql, PubSub } from 'apollo-server'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import jwt from 'jsonwebtoken'
@@ -17,6 +17,8 @@ connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindA
   .catch((error) => {
     console.log('error connection to MongoDB:', error.message)
   })
+
+const pubsub = new PubSub()
 
 const typeDefs = gql`
  type Author {
@@ -127,8 +129,10 @@ const resolvers = {
   Mutation: {
     addBook: async (root, args, context) => {
       const currentUser = context.currentUser
-        if(!currentUser)
+      if (!currentUser)
         throw new AuthenticationError("not authenticated")
+
+      const book = new Book({ ...args, author: author })
       try {
         let author = await Author.findOne({ name: args.author })
         if (!author) {
@@ -136,28 +140,34 @@ const resolvers = {
           await author.save()
         }
 
-        const book = new Book({ ...args, author: author })
-        return await book.save()
+        await book.save()
       } catch (err) {
         throw new UserInputError(err.message, {
           invalidArgs: args,
         })
       }
+
+      pubsub.publish('CREATE_BOOKS', { bookAdded: book })
+      return book
+
     },
     editAuthor: async (root, args, context) => {
       const currentUser = context.currentUser
-        if(!currentUser)
+      if (!currentUser)
         throw new AuthenticationError("not authenticated")
+      let author
       try {
-        return await Author.findOneAndUpdate({ name: args.name }, { name: args.name, born: args.setBornTo }, { new: true })
+        author = await Author.findOneAndUpdate({ name: args.name }, { name: args.name, born: args.setBornTo }, { new: true })
       } catch (err) {
         throw new UserInputError(err.message, {
           invalidArgs: args,
         })
       }
+      pubsub.publish('UPDATE_AUTHOR', { updatedAuthor: author })
+      return author
     },
     createUser: async (root, args) => {
-      const user = new User({...args})
+      const user = new User({ ...args })
       try {
         return await user.save()
       } catch (error) {
@@ -168,17 +178,22 @@ const resolvers = {
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username })
-  
-      if ( !user || args.password !== 'secred' ) {
+
+      if (!user || args.password !== 'secred') {
         throw new UserInputError("wrong credentials")
       }
-  
+
       const userForToken = {
         username: user.username,
         id: user._id,
       }
-  
+
       return { value: jwt.sign(userForToken, JWT_SECRET) }
+    }
+  },
+  Subscription: {
+    createBook: {
+      subscribe: () => pubsub.asyncIterator([CREATE_BOOKS])
     }
   }
 }
