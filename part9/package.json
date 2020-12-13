@@ -1,0 +1,10 @@
+{
+  "name": "part9",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "ts-node": "ts-node -- bmiCalculator.ts"
+  },
+  "author": "",
+  "license": "ISC"
+}
