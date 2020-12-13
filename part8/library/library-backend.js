@@ -9,6 +9,7 @@ import User from './models/user.js'
 dotenv.config()
 const MONGODB_URI = process.env.MONGODB_URI
 const JWT_SECRET = process.env.JWT_SECRET
+const pubsub= new PubSub()
 const { connect } = mongoose
 connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
   .then(() => {
@@ -17,8 +18,6 @@ connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindA
   .catch((error) => {
     console.log('error connection to MongoDB:', error.message)
   })
-
-const pubsub = new PubSub()
 
 const typeDefs = gql`
  type Author {
@@ -74,6 +73,10 @@ type Token {
       password: String!
     ): Token
   }
+
+  type Subscription {
+  bookAdded: Book!
+}    
 `
 
 const resolvers = {
@@ -116,58 +119,42 @@ const resolvers = {
       return context.currentUser
     }
   },
-  Author: {
-    bookCount: async (root) => {
-      try {
-        const author = await Author.find({ name: root.name })
-        return await Book.find({ author: author }).countDocuments()
-      } catch (err) {
-        throw new UserInputError(err.message)
-      }
-    }
-  },
   Mutation: {
     addBook: async (root, args, context) => {
       const currentUser = context.currentUser
-      if (!currentUser)
+        if(!currentUser)
         throw new AuthenticationError("not authenticated")
-
-      const book = new Book({ ...args, author: author })
       try {
         let author = await Author.findOne({ name: args.author })
         if (!author) {
-          author = new Author({ name: args.author })
+          author = new Author({ name: args.author, bookCount:1 })
           await author.save()
+        }else{
+          author.countBooks(++author.countBooks)
         }
-
-        await book.save()
+        const book = new Book({ ...args, author: author })
+        pubsub.publish('BOOK_ADDED', { bookAdded: book })
+        return await book.save()
       } catch (err) {
         throw new UserInputError(err.message, {
           invalidArgs: args,
         })
       }
-
-      pubsub.publish('CREATE_BOOKS', { bookAdded: book })
-      return book
-
     },
     editAuthor: async (root, args, context) => {
       const currentUser = context.currentUser
-      if (!currentUser)
+        if(!currentUser)
         throw new AuthenticationError("not authenticated")
-      let author
       try {
-        author = await Author.findOneAndUpdate({ name: args.name }, { name: args.name, born: args.setBornTo }, { new: true })
+        return await Author.findOneAndUpdate({ name: args.name }, { name: args.name, born: args.setBornTo }, { new: true })
       } catch (err) {
         throw new UserInputError(err.message, {
           invalidArgs: args,
         })
       }
-      pubsub.publish('UPDATE_AUTHOR', { updatedAuthor: author })
-      return author
     },
     createUser: async (root, args) => {
-      const user = new User({ ...args })
+      const user = new User({...args})
       try {
         return await user.save()
       } catch (error) {
@@ -178,22 +165,22 @@ const resolvers = {
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username })
-
-      if (!user || args.password !== 'secred') {
+  
+      if ( !user || args.password !== 'secred' ) {
         throw new UserInputError("wrong credentials")
       }
-
+  
       const userForToken = {
         username: user.username,
         id: user._id,
       }
-
+  
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     }
   },
-  Subscription: {
-    createBook: {
-      subscribe: () => pubsub.asyncIterator([CREATE_BOOKS])
+  Subscription:{ 
+    bookAdded:{ 
+      subscribe: ()=> pubsub.asyncIterator(['BOOK_ADDED'])
     }
   }
 }

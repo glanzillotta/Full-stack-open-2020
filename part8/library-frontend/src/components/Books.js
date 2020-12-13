@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { ALL_BOOKS_FILTERED, USER_GENRE, ALL_GENRES } from './queries'
+import { ALL_BOOKS, USER_GENRE, ALL_GENRES } from './queries'
 
 const Books = ({ show }) => {
   const genre = useQuery(USER_GENRE)
-  const [getFavorites, favorites] = useLazyQuery(ALL_BOOKS_FILTERED)
+  const [getFavorites, favorites] = useLazyQuery(ALL_BOOKS)
   const genres = useQuery(ALL_GENRES)
   const [filter, setFilter] = useState('')
   const [books, setBooks] = useState([])
 
   useEffect(() => {
     if (genre.data) getFavorites({ variables: { genre: genre.data.me.favoriteGenre } })
-    if(filter) getFavorites({ variables: { genre: filter } })
+    if(filter || filter===null) getFavorites({ variables: { genre: filter } })
     if (favorites.data) setBooks(favorites.data.allBooks)
   }, [genre.data, favorites.data, filter]) //eslint-disable-line
 
