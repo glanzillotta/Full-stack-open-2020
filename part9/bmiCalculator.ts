@@ -1,4 +1,4 @@
-interface InputBmi {
+/*interface InputBmi {
     value1: number,
     value2: number
 };
@@ -15,9 +15,9 @@ const parseArgumentsBmi = (args: Array<string>): InputBmi => {
     } else {
         throw new Error('Provided values were not numbers!');
     }
-}
+}*/
 
-const calculateBmi = (height: number, weight: number): string => {
+export const calculateBmi = (height: number, weight: number): string => {
     const bmi = weight / ((height / 100) ** 2);
     switch (true) {
         case bmi > 0 && bmi < 15:
@@ -38,10 +38,10 @@ const calculateBmi = (height: number, weight: number): string => {
             return 'Obese Class III (Very severely obese) ';
         default: return '';
     }
-}
+}/*
 try {
     const { value1, value2 } = parseArgumentsBmi(process.argv);
     console.log(calculateBmi(value1, value2));
 } catch (e) {
     console.log('Error, something bad happened, message: ', e.message)
-}
+}*/
