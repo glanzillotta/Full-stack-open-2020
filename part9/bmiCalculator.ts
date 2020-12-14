@@ -38,8 +38,9 @@ export const calculateBmi = (height: number, weight: number): string => {
             return 'Obese Class III (Very severely obese) ';
         default: return '';
     }
-}/*
-try {
+};
+
+/*try {
     const { value1, value2 } = parseArgumentsBmi(process.argv);
     console.log(calculateBmi(value1, value2));
 } catch (e) {
