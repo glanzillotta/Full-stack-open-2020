@@ -19,7 +19,7 @@ const parseArgumentsExercise = (args: Array<string>): InputExercise => {
     if (!isNaN(Number(args[2]))) {
         return {
             targetAmountsDaily: Number(args[2]),
-            dailyExercisesHours: args.filter((arg,i)=>i>2&&!isNaN(Number(arg))).map((arg) => Number(arg))
+            dailyExercisesHours: args.filter((arg, i) => i > 2 && !isNaN(Number(arg))).map((arg) => Number(arg))
         }
     } else {
         throw new Error('Provided values were not numbers!');
@@ -50,7 +50,10 @@ const calculateExercises = (dailyExercisesHours: Array<number>, targetAmountsDai
             rating = 1
             ratingDescription = 'come one we know you could do better';
             break;
-        default: rating = 0; break;
+        default:
+            rating = 0;
+            ratingDescription='you\'re not even trying'
+            break;
     }
 
     return {
