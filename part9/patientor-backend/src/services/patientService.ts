@@ -1,7 +1,7 @@
-import patientsData from '../../data/patients.json';
-import { Patient, NonSensitivePatient, newPatient } from '../type';
+import patientsData from '../../data/patients';
+import { Patient, NonSensitivePatient, NewPatient } from '../type';
 
-const patients: Array<Patient> = patientsData as Array<Patient>;
+const patients: Array<Patient> = patientsData;
 
 const getPatients = (): Array<Patient> => {
     return patients;
@@ -13,7 +13,7 @@ const getNonSensitivePatient = (): NonSensitivePatient[] => {
     }));
 };
 
-const addPatient = (entry: newPatient ): Patient => {
+const addPatient = (entry: NewPatient ): Patient => {
     const idNewPatientEntry=Math.max(...patients.map(p => +p.id)) + 1;
     const newPatientEntry={
         id:String(idNewPatientEntry),
