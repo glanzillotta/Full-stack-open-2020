@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Gender, NewPatient } from '../type';
 
 const isGender = (value: any): value is Gender => {
@@ -42,6 +44,7 @@ const parseDateOfBirth = (date: any): string => {
     return new Date(date).toISOString().split('T')[0];
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const toNewPatient = (object: any): NewPatient => {
     return {
         gender: parseGender(object.gender),
