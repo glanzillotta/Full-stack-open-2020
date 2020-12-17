@@ -44,6 +44,10 @@ const parseDateOfBirth = (date: any): string => {
     return new Date(date).toISOString().split('T')[0];
 };
 
+const parseEntries = ()=>{
+    return [];
+};
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const toNewPatient = (object: any): NewPatient => {
     return {
@@ -52,6 +56,7 @@ const toNewPatient = (object: any): NewPatient => {
         occupation: parseOccupation(object.occupation),
         ssn: parseSsn(object.ssn),
         dateOfBirth: parseDateOfBirth(object.dateOfBirth),
+        entries:parseEntries()
     };
 };
 

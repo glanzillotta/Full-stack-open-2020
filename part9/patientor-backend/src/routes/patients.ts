@@ -5,7 +5,7 @@ import toNewPatient from '../utils/utils';
 const router = express.Router();
 
 router.get('/', (_req, res) => {
-    res.json(patientService.getNonSensitivePatient());
+    res.json(patientService.getPublicPatient());
 });
 
 router.post('/', (req, res) => {
@@ -17,6 +17,13 @@ router.post('/', (req, res) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         res.status(400).send(e.message);
     }
+});
+
+router.get('/:id', (req, res)=>{
+    const patient=patientService.getPatient(String(req.params.id));
+    if(!patient)
+        res.status(400).json({ error: 'patient not found or not existent' });
+    res.json();
 });
 
 export default router;
