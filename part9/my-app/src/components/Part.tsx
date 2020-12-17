@@ -9,9 +9,10 @@ const Part: React.FC<{ part: CoursePart }> = ({ part }) => {
             return <p>{part.name},{part.exerciseCount}, {part.groupProjectCount}</p>;
         case 'Deeper type usage':
             return <p>{part.name},{part.exerciseCount},{part.description},{part.exerciseSubmissionLink}</p>;
+        case 'Full Stack Course':
+            return <p>{part.name},{part.exerciseCount},{part.description}</p>;
         default: 
-        assertNever(part)
-        return null;
+        return assertNever(part);
     }
 }
 
